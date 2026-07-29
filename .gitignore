@@ -1,0 +1,33 @@
+# ── Dependencies & build output ──────────────────────────────────────────────
+node_modules/
+web/dist/
+dist/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# ── OS / editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── BMAD framework tooling (skill engine, không phải mã sản phẩm) ─────────────
+# _bmad-output/ (PRD, UX, architecture, epics) VẪN được track — đó là deliverable.
+.agents/
+.claude/skills/
+_bmad/
+
+# ── Scratch & temp ───────────────────────────────────────────────────────────
+.codex-tmp/
+**/.working/
+
+# ── Tài liệu nguồn chưa rõ quyền tái phân phối ────────────────────────────────
+# BCTC PDF: data_inventory.csv ghi "chưa thấy giấy phép tái phân phối / pending
+# rights review". PRD FR-28 & NFR-11 cấm tái phân phối khi chưa có quyền — không
+# đưa vào repo (đặc biệt khi repo có thể được push/deploy công khai).
+.tmp-bctc-inventory/
