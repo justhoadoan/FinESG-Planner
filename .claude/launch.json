@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "finesg-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "web"],
+      "port": 5173
+    },
+    {
+      "name": "finesg-api",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": [
+        "run",
+        "--directory",
+        "api",
+        "uvicorn",
+        "--app-dir",
+        "src",
+        "finesg.http.app:app",
+        "--reload",
+        "--port",
+        "8033"
+      ],
+      "port": 8033
+    }
+  ]
+}
