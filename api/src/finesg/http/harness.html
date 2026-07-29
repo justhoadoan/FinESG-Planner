@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinESG — Bàn thử engine tài chính (E0)</title>
+<style>
+  :root{
+    --bg:#F5F7FA; --surface:#FFFFFF; --subtle:#EEF2F6; --on:#172033; --muted:#526075;
+    --outline:#7A8798; --primary:#164E63; --primary-subtle:#DDF1F4;
+    --finance:#315C9B; --debt:#925C2D; --carbon:#227354;
+    --ok:#19704E; --ok-bg:#E5F4EC; --warn:#8A5A00; --warn-bg:#FFF3D6;
+    --err:#B42318; --err-bg:#FDECEA; --focus:#1D4ED8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--on);
+    font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 64px}
+  h1{font-size:24px;font-weight:650;margin:0 0 4px}
+  h2{font-size:16px;font-weight:650;margin:0 0 12px}
+  .banner{background:var(--warn-bg);border:1px solid var(--warn);border-radius:8px;
+    padding:12px 14px;margin:16px 0 24px}
+  .banner b{color:var(--warn)}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--outline);border-radius:8px;padding:16px}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 4px}
+  label:first-of-type{margin-top:0}
+  .hint{font-weight:400;color:var(--muted);font-size:12px}
+  input[type=number],select{width:100%;height:40px;padding:0 10px;border:1px solid var(--outline);
+    border-radius:4px;font:inherit;background:var(--surface);color:var(--on)}
+  input:focus,select:focus,button:focus{outline:3px solid var(--focus);outline-offset:1px}
+  button{margin-top:18px;width:100%;height:44px;border:0;border-radius:6px;
+    background:var(--primary);color:#fff;font:600 14px/1 inherit;cursor:pointer}
+  button:hover{background:#0F3F50}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+  .kpi{background:var(--subtle);border-radius:6px;padding:10px 12px}
+  .kpi .k{font-size:12px;color:var(--muted)}
+  .kpi .v{font-size:18px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px}
+  .kpi .p{font-size:11px;color:var(--muted);margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  caption{text-align:left;font-size:13px;color:var(--muted);padding-bottom:8px}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--subtle);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:12px;color:var(--muted);border-bottom:1px solid var(--outline)}
+  tr.breach td{background:var(--err-bg)}
+  tr.breach td:first-child{font-weight:650;color:var(--err)}
+  .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.bad{background:var(--err-bg);color:var(--err)}
+  .err{background:var(--err-bg);border:1px solid var(--err);border-radius:8px;padding:14px}
+  .err h3{margin:0 0 8px;font-size:15px;color:var(--err)}
+  .err dt{font-size:12px;color:var(--muted);margin-top:8px}
+  .err dd{margin:2px 0 0}
+  code{font:12px/1.4 "IBM Plex Mono",SFMono-Regular,Consolas,monospace;
+    background:var(--subtle);padding:1px 5px;border-radius:3px}
+  .foot{margin-top:20px;color:var(--muted);font-size:12px}
+  a{color:var(--primary)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bàn thử engine tài chính</h1>
+  <p class="hint">Hợp đồng tính toán 12 tháng — PRD §4.3.1</p>
+
+  <div class="banner">
+    <b>Đây không phải giao diện sản phẩm.</b> S01–S19 trong <code>EXPERIENCE.md</code> chưa được
+    dựng. Trang này chỉ phơi <em>kernel tính toán</em> của E0 ra để bấm thử — cùng một hàm
+    <code>build_ledger()</code> mà golden test gọi, không có đường tính toán thứ hai.
+    API đầy đủ ở <a href="/docs">/docs</a>.
+  </div>
+
+  <div class="grid">
+    <form class="card" id="controls">
+      <h2>Đầu vào</h2>
+
+      <label>FS-01 · Tiền và tương đương tiền
+        <span class="hint">Ví dụ chuẩn: 100</span></label>
+      <input type="number" id="cash" value="100" step="any">
+
+      <label>FS-07 · Vốn chủ sở hữu
+        <span class="hint">≤ 0 sẽ chặn Phân tích 12 tháng</span></label>
+      <input type="number" id="equity" value="100" step="any">
+
+      <label>Tiền mặt tối thiểu mỗi tháng
+        <span class="hint">A18/DR-16 — ngưỡng theo từng tháng</span></label>
+      <input type="number" id="floor" value="0" step="any">
+
+      <label>Thời điểm giải ngân Gói vay</label>
+      <select id="drawdown">
+        <option value="early">Sớm — tháng 1–2</option>
+        <option value="late">Muộn — tháng 11–12</option>
+      </select>
+
+      <label>Dòng tiền Dự án đã nằm trong dự báo kinh doanh?
+        <span class="hint">FR-10 — chống cộng trùng</span></label>
+      <select id="included">
+        <option value="false">Chưa — cộng thêm vào CFADS</option>
+        <option value="true">Rồi — không cộng lại</option>
+        <option value="null">Chưa khai báo</option>
+      </select>
+
+      <button type="submit">Tính ledger 12 tháng</button>
+    </form>
+
+    <div id="out" class="card"><p class="hint">Đang tính…</p></div>
+  </div>
+
+  <p class="foot" id="meta"></p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const num = v => Number(v).toLocaleString('vi-VN', {maximumFractionDigits: 4});
+let template = null;
+
+const EXPECTED = {
+  cash_end_12: 110, cfads_12: 50, debt_service_12: 20,
+  dscr_12: 2.5, debt_end_12: 95, debt_to_equity_12: 0.95
+};
+
+async function boot() {
+  template = await (await fetch('/api/v1/examples/canonical')).json();
+  const meta = await (await fetch('/api/v1/meta')).json();
+  $('meta').textContent =
+    `${meta.calc_contract_version} · ${meta.tolerances_version} · phạm vi đã hiện thực: ${meta.implemented_scope.join(', ')}`;
+  run();
+}
+
+function buildPayload() {
+  const p = structuredClone(template);
+  p.data.baseline.fs01_cash = String($('cash').value);
+  p.data.baseline.fs07_equity = String($('equity').value);
+  p.data.cash_minimum.values = Array(12).fill(String($('floor').value));
+
+  const share = Array(12).fill("0");
+  if ($('drawdown').value === 'early') { share[0] = "0.5"; share[1] = "0.5"; }
+  else { share[10] = "0.5"; share[11] = "0.5"; }
+  p.data.loans[0].drawdown_share.values = share;
+
+  const inc = $('included').value;
+  p.data.projects[0].ocf_already_in_operating_forecast =
+    inc === 'null' ? null : inc === 'true';
+  return p;
+}
+
+function verdict(key, actual) {
+  if (!(key in EXPECTED)) return '';
+  if (actual === null) return '';
+  const ok = Math.abs(Number(actual) - EXPECTED[key]) < 1e-6;
+  return `<div class="p">${ok ? '✓' : '≠'} chuẩn §4.3.1: ${EXPECTED[key]}</div>`;
+}
+
+function renderOk(r) {
+  const kpi = (k, label, val, period) => `
+    <div class="kpi"><div class="k">${label}</div>
+      <div class="v">${val}</div>
+      ${period ? `<div class="p">${period}</div>` : ''}${verdict(k, r[k])}</div>`;
+
+  const breach = r.cash_floor_breach_months;
+  const status = breach.length
+    ? `<span class="pill bad">Vi phạm ngưỡng tiền mặt ở tháng ${breach.join(', ')}</span>`
+    : `<span class="pill ok">Không tháng nào dưới ngưỡng</span>`;
+
+  $('out').innerHTML = `
+    <h2>Kết quả ${status}</h2>
+    <div class="kpis">
+      ${kpi('cash_end_12','Tiền cuối kỳ', num(r.cash_end_12), r.cash_end_12_period)}
+      ${kpi('cfads_12','CFADS 12 tháng', num(r.cfads_12))}
+      ${kpi('debt_service_12','Nghĩa vụ nợ 12 tháng', num(r.debt_service_12))}
+      ${kpi('dscr_12','DSCR 12 tháng', r.dscr_12 === null ? 'N/A' : num(r.dscr_12))}
+      ${kpi('debt_end_12','Nợ cuối kỳ', num(r.debt_end_12))}
+      ${kpi('debt_to_equity_12','Nợ / Vốn chủ cơ sở', num(r.debt_to_equity_12))}
+      <div class="kpi"><div class="k">NPV trước tài trợ</div>
+        <div class="v">${num(r.portfolio_npv)}</div>
+        <div class="p">${r.portfolio_npv_period}</div></div>
+      <div class="kpi"><div class="k">Chi phí tài trợ (PV)</div>
+        <div class="v">${num(r.financing_cost_pv)}</div>
+        <div class="p">tách khỏi NPV — §7.1</div></div>
+    </div>
+    <table>
+      <caption>Đi bộ tiền mặt theo tháng. Tiền cuối kỳ dương không đảm bảo mọi tháng đều đạt ngưỡng.</caption>
+      <thead><tr><th>Tháng</th><th>Giải ngân</th><th>Tiền cuối tháng</th><th>Ngưỡng</th></tr></thead>
+      <tbody>${r.months.map(m => `
+        <tr class="${m.breaches_floor ? 'breach' : ''}">
+          <td>T${m.month}${m.breaches_floor ? ' · dưới ngưỡng' : ''}</td>
+          <td>${num(m.drawdown)}</td><td>${num(m.cash)}</td>
+          <td>${m.cash_minimum === null ? '—' : num(m.cash_minimum)}</td>
+        </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+function renderErr(e) {
+  $('out').innerHTML = `
+    <div class="err">
+      <h3>${e.message_vi}</h3>
+      <dl>
+        <dt>Tác động</dt><dd>${e.impact_vi}</dd>
+        <dt>Hành động</dt><dd>${e.remediation_vi}</dd>
+        <dt>Mã</dt><dd><code>${e.code}</code> · <code>${e.correlation_id}</code></dd>
+      </dl>
+    </div>
+    <p class="foot">Hệ thống không tự nới điều kiện và không điền 0 thay cho giá trị thiếu.</p>`;
+}
+
+async function run() {
+  const res = await fetch('/api/v1/ledger', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(buildPayload())
+  });
+  const body = await res.json();
+  res.ok ? renderOk(body) : renderErr(body);
+}
+
+$('controls').addEventListener('submit', e => { e.preventDefault(); run(); });
+boot();
+</script>
+</body>
+</html>
