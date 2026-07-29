@@ -1,0 +1,86 @@
+.solver-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-outline);
+  margin-bottom: var(--space-xl);
+}
+.solver-banner__glyph {
+  font-size: 22px;
+  line-height: 1;
+}
+.solver-banner__title {
+  font-size: var(--type-heading-sm-size);
+  font-weight: 650;
+}
+.solver-banner__detail {
+  font-size: var(--type-body-compact-size);
+  color: var(--color-on-surface-muted);
+  margin-top: 2px;
+}
+.solver-banner[data-tone='verified'] {
+  background: var(--color-verified-subtle);
+  border-color: var(--color-verified);
+}
+.solver-banner[data-tone='verified'] .solver-banner__glyph,
+.solver-banner[data-tone='verified'] .solver-banner__title {
+  color: var(--color-verified);
+}
+.solver-banner[data-tone='warning'] {
+  background: var(--color-warning-subtle);
+  border-color: var(--color-warning);
+}
+.solver-banner[data-tone='warning'] .solver-banner__glyph,
+.solver-banner[data-tone='warning'] .solver-banner__title {
+  color: var(--color-warning);
+}
+.solver-banner[data-tone='error'] {
+  background: var(--color-error-subtle);
+  border-color: var(--color-error);
+}
+.solver-banner[data-tone='error'] .solver-banner__glyph,
+.solver-banner[data-tone='error'] .solver-banner__title {
+  color: var(--color-error);
+}
+
+.metric-group {
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+.metric-group__title {
+  font-size: var(--type-label-size);
+  font-weight: var(--type-label-weight);
+  color: var(--color-on-surface-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-md);
+}
+.metric-group__grid {
+  display: grid;
+  gap: var(--space-md);
+}
+.metric {
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--color-outline);
+}
+.metric[data-tone='finance'] { border-left-color: var(--color-finance); }
+.metric[data-tone='carbon'] { border-left-color: var(--color-carbon); }
+.metric[data-tone='debt'] { border-left-color: var(--color-debt); }
+.metric[data-tone='risk'] { border-left-color: var(--color-risk); }
+.metric__label {
+  font-size: var(--type-caption-size);
+  color: var(--color-on-surface-muted);
+}
+.metric__value {
+  font-size: var(--type-heading-md-size);
+  font-weight: 650;
+  line-height: 1.2;
+}
+.metric__meta {
+  font-size: var(--type-caption-size);
+  color: var(--color-on-surface-muted);
+}

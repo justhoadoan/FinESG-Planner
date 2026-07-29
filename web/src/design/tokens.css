@@ -1,0 +1,111 @@
+/*
+ * Design token — TRÍCH TỪ DESIGN.md frontmatter, không phải nguồn độc lập.
+ * DESIGN.md (ux-FinESG-2026-07-29) sở hữu các giá trị này; file này chỉ chiếu
+ * chúng sang CSS custom property. Đổi token phải đổi ở DESIGN.md trước.
+ *
+ * D-A3 [ASSUMPTION]: P0 chỉ giao diện sáng.
+ * D-A2 [DECIDED]: library-neutral — không kế thừa mặc định của thư viện nào.
+ */
+
+:root {
+  /* ── Colors (32 token) ── */
+  --color-background: #F5F7FA;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #EEF2F6;
+  --color-surface-strong: #E2E8F0;
+  --color-on-surface: #172033;
+  --color-on-surface-muted: #526075;
+  --color-outline: #7A8798;
+  --color-outline-strong: #526075;
+  --color-primary: #164E63;
+  --color-primary-hover: #0F3F50;
+  --color-primary-subtle: #DDF1F4;
+  --color-on-primary: #FFFFFF;
+  --color-finance: #315C9B;
+  --color-carbon: #227354;
+  --color-risk: #8A3F67;
+  --color-debt: #925C2D;
+  --color-info: #2457A6;
+  --color-info-subtle: #E8F0FC;
+  --color-success: #19704E;
+  --color-success-subtle: #E5F4EC;
+  --color-warning: #8A5A00;
+  --color-warning-subtle: #FFF3D6;
+  --color-estimated: #7A4E00;
+  --color-estimated-subtle: #FFF7E6;
+  --color-error: #B42318;
+  --color-error-subtle: #FDECEA;
+  --color-simulation: #6941C6;
+  --color-simulation-subtle: #F0EBFF;
+  --color-verified: #1F5A78;
+  --color-verified-subtle: #E5F1F7;
+  --color-focus: #1D4ED8;
+  --color-disabled: #97A3B2;
+
+  /* ── Typography ── */
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  --type-display-size: 32px;
+  --type-display-weight: 650;
+  --type-display-lh: 1.2;
+  --type-display-ls: -0.02em;
+  --type-heading-lg-size: 24px;
+  --type-heading-lg-weight: 650;
+  --type-heading-lg-lh: 1.3;
+  --type-heading-md-size: 20px;
+  --type-heading-md-weight: 650;
+  --type-heading-md-lh: 1.35;
+  --type-heading-sm-size: 16px;
+  --type-heading-sm-weight: 650;
+  --type-heading-sm-lh: 1.4;
+  --type-body-size: 14px;
+  --type-body-lh: 1.5;
+  --type-body-compact-size: 13px;
+  --type-body-compact-lh: 1.45;
+  --type-label-size: 13px;
+  --type-label-weight: 600;
+  --type-label-lh: 1.35;
+  --type-caption-size: 12px;
+  --type-caption-weight: 450;
+  --type-caption-lh: 1.4;
+  --type-code-size: 12px;
+  --type-code-weight: 500;
+  --type-code-lh: 1.4;
+  --type-number-size: 14px;
+  --type-number-weight: 600;
+  --type-number-lh: 1.4;
+
+  /* ── Radius ── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-default: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ── Spacing ── */
+  --space-unit: 4px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+  --space-section: 48px;
+  --page-desktop: 32px;
+  --page-tablet: 24px;
+  --page-mobile: 16px;
+  --control-height: 44px;
+  --touch-target-min: 44px;
+  --data-row-height: 44px;
+  --sidebar-width: 272px;
+  --context-panel-width: 400px;
+  --content-max-width: 1600px;
+
+  /* ── Elevation ── */
+  --elevation-surface: 0 1px 2px rgba(23, 32, 51, 0.06);
+  --elevation-raised: 0 8px 24px rgba(23, 32, 51, 0.10);
+  --elevation-overlay: 0 16px 48px rgba(23, 32, 51, 0.16);
+  --elevation-focus-ring: 0 0 0 3px var(--color-focus);
+}
