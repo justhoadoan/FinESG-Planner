@@ -1,0 +1,1800 @@
+<!--
+  GOVERNING SPINES — spines win on conflict with this mock.
+  DESIGN.md: Brand & Style; Colors > Trạng thái; Typography; Layout & Spacing;
+  Components > App shell và điều hướng, Source-linked field, Numeric input và bảng 12 tháng,
+  Status badge và banner, Dialog, drawer và xác nhận.
+  EXPERIENCE.md: Information Architecture > S05; Readiness, Confirmation and Version Contract;
+  Input Field Contracts > S05 — Bộ 12 Trường BCTC; Component Patterns > Trường liên kết nguồn,
+  PDF provenance viewer, Bảng dữ liệu chỉnh sửa được, Panel xác nhận; State Patterns;
+  Interaction Primitives; Accessibility Floor; Responsive & Platform; Key Flows > UJ-2.
+
+  COMPONENT CHECKPOINT
+  Intent: Lan, Kế toán trưởng, phải đối chiếu và xác nhận đúng 12 trường trước khi dữ liệu được tính.
+  Palette: chỉ dùng DESIGN.md tokens; xanh than cho hành động, hổ phách cho cần kiểm tra,
+  xanh lục cho đã xác nhận, đỏ cho lỗi chặn.
+  Depth: borders-first; elevation.surface cho panel, elevation.raised cho thanh xác nhận.
+  Surfaces: background → surface → surface_subtle, không thêm màu ngoài token.
+  Typography: Inter/system sans; số tabular.
+  Spacing: base 4px; dùng 4/8/12/16/24/32.
+  Signature: evidence rail — Giá trị → Nguồn → Xác nhận → Phiên bản → Tác động.
+-->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FinESG Planner — S05 Đối chiếu BCTC</title>
+  <style>
+    :root {
+      --background: #F5F7FA;
+      --surface: #FFFFFF;
+      --surface-subtle: #EEF2F6;
+      --surface-strong: #E2E8F0;
+      --on-surface: #172033;
+      --on-surface-muted: #526075;
+      --outline: #C5CED8;
+      --outline-strong: #8B98AA;
+      --primary: #164E63;
+      --primary-hover: #0F3F50;
+      --primary-subtle: #DDF1F4;
+      --on-primary: #FFFFFF;
+      --finance: #315C9B;
+      --carbon: #227354;
+      --risk: #8A3F67;
+      --debt: #925C2D;
+      --info: #2457A6;
+      --info-subtle: #E8F0FC;
+      --success: #19704E;
+      --success-subtle: #E5F4EC;
+      --warning: #8A5A00;
+      --warning-subtle: #FFF3D6;
+      --estimated: #7A4E00;
+      --estimated-subtle: #FFF7E6;
+      --error: #B42318;
+      --error-subtle: #FDECEA;
+      --simulation: #6941C6;
+      --simulation-subtle: #F0EBFF;
+      --verified: #1F5A78;
+      --verified-subtle: #E5F1F7;
+      --focus: #1D4ED8;
+      --disabled: #97A3B2;
+
+      --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      --text-display: 32px;
+      --text-heading-lg: 24px;
+      --text-heading-md: 20px;
+      --text-heading-sm: 16px;
+      --text-body: 14px;
+      --text-compact: 13px;
+      --text-label: 13px;
+      --text-caption: 12px;
+
+      --radius-xs: 2px;
+      --radius-sm: 4px;
+      --radius-default: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+
+      --elevation-surface: 0 1px 2px rgba(23, 32, 51, 0.06);
+      --elevation-raised: 0 8px 24px rgba(23, 32, 51, 0.10);
+      --elevation-overlay: 0 16px 48px rgba(23, 32, 51, 0.16);
+      --focus-ring: 0 0 0 3px rgba(29, 78, 216, 0.28);
+
+      --control-height: 40px;
+      --compact-control-height: 32px;
+      --touch-target: 44px;
+      --data-row-height: 44px;
+      --sidebar-width: 272px;
+      --context-panel-width: 400px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--surface-strong);
+      color: var(--on-surface);
+      font-family: var(--font-sans);
+      font-size: var(--text-body);
+      line-height: 1.5;
+    }
+
+    body {
+      margin: 0;
+      min-width: max-content;
+      padding: var(--space-8) var(--space-6);
+      background: var(--surface-strong);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      min-height: var(--control-height);
+      border: 1px solid var(--outline-strong);
+      border-radius: var(--radius-default);
+      padding: 0 var(--space-4);
+      color: var(--on-surface);
+      background: var(--surface);
+      font-weight: 650;
+    }
+
+    button.primary {
+      border-color: var(--primary);
+      color: var(--on-primary);
+      background: var(--primary);
+    }
+
+    button.compact {
+      min-height: var(--compact-control-height);
+      padding: 0 var(--space-3);
+      font-size: var(--text-compact);
+    }
+
+    button:disabled {
+      border-color: var(--outline);
+      color: var(--on-surface-muted);
+      background: var(--surface-strong);
+      cursor: not-allowed;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+      box-shadow: var(--focus-ring);
+    }
+
+    a {
+      color: var(--primary);
+      font-weight: 650;
+      text-underline-offset: 3px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .specimen {
+      margin: 0 0 var(--space-12);
+    }
+
+    .specimen-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      width: fit-content;
+      min-width: 320px;
+      margin: 0 0 var(--space-3);
+      color: var(--on-surface);
+    }
+
+    .specimen-label strong {
+      font-size: var(--text-heading-sm);
+    }
+
+    .specimen-label span {
+      margin-left: var(--space-4);
+      color: var(--on-surface-muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+    }
+
+    .viewport {
+      overflow: hidden;
+      border: 1px solid var(--outline-strong);
+      border-radius: var(--radius-lg);
+      background: var(--background);
+      box-shadow: var(--elevation-overlay);
+    }
+
+    .desktop-viewport {
+      width: 1440px;
+      height: 1024px;
+    }
+
+    .tablet-viewport {
+      width: 900px;
+      height: 1100px;
+    }
+
+    .app {
+      height: 100%;
+      min-height: 0;
+      background: var(--background);
+    }
+
+    .desktop-app {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    }
+
+    .sidebar {
+      display: grid;
+      grid-template-rows: 64px auto 1fr auto;
+      min-width: 0;
+      border-right: 1px solid var(--outline);
+      background: var(--background);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0 var(--space-6);
+      border-bottom: 1px solid var(--outline);
+      font-weight: 650;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-default);
+      color: var(--on-primary);
+      background: var(--primary);
+      font-family: var(--font-mono);
+      font-size: var(--text-label);
+    }
+
+    .profile-summary {
+      margin: var(--space-4);
+      padding: var(--space-4);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--elevation-surface);
+    }
+
+    .eyebrow {
+      display: block;
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .profile-summary strong {
+      display: block;
+      margin-top: var(--space-1);
+      font-size: var(--text-heading-sm);
+      line-height: 1.35;
+    }
+
+    .profile-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .nav {
+      padding: 0 var(--space-4);
+    }
+
+    .nav-group-label {
+      padding: var(--space-2) var(--space-3);
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    .nav a {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      align-items: center;
+      min-height: var(--touch-target);
+      margin-bottom: var(--space-1);
+      padding: 0 var(--space-3);
+      border-left: 3px solid transparent;
+      border-radius: var(--radius-default);
+      color: var(--on-surface);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .nav a[aria-current="page"] {
+      border-left-color: var(--primary);
+      background: var(--primary-subtle);
+      font-weight: 650;
+    }
+
+    .nav-icon {
+      color: var(--on-surface-muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+    }
+
+    .nav-state {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .sidebar-footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--outline);
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .main-shell {
+      display: grid;
+      grid-template-rows: 56px minmax(0, 1fr);
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      min-width: 0;
+      padding: 0 var(--space-6);
+      border-bottom: 1px solid var(--outline);
+      background: var(--surface);
+    }
+
+    .crumbs {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--on-surface-muted);
+      font-size: var(--text-compact);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .crumbs strong {
+      color: var(--on-surface);
+    }
+
+    .actor {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      white-space: nowrap;
+    }
+
+    .actor-copy {
+      text-align: right;
+    }
+
+    .actor-copy strong,
+    .actor-copy span {
+      display: block;
+    }
+
+    .actor-copy strong {
+      font-size: var(--text-compact);
+    }
+
+    .actor-copy span {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-full);
+      color: var(--primary);
+      background: var(--primary-subtle);
+      font-weight: 650;
+    }
+
+    .screen-content {
+      display: grid;
+      min-width: 0;
+      min-height: 0;
+      padding: var(--space-4) var(--space-6);
+      gap: var(--space-3);
+      overflow: hidden;
+    }
+
+    .desktop-content {
+      grid-template-rows: 44px 52px 64px minmax(0, 1fr) 108px;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .page-title {
+      min-width: 0;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: var(--text-heading-md);
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .page-title p {
+      margin: 2px 0 0;
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .head-state {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      min-height: 24px;
+      padding: var(--space-1) var(--space-2);
+      border: 1px solid currentColor;
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      font-weight: 650;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .badge.success {
+      color: var(--success);
+      background: var(--success-subtle);
+    }
+
+    .badge.warning {
+      color: var(--warning);
+      background: var(--warning-subtle);
+    }
+
+    .badge.info {
+      color: var(--info);
+      background: var(--info-subtle);
+    }
+
+    .badge.neutral {
+      color: var(--on-surface-muted);
+      background: var(--surface-subtle);
+    }
+
+    .badge.simulation {
+      color: var(--simulation);
+      background: var(--simulation-subtle);
+    }
+
+    .status-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-caption);
+      line-height: 1;
+    }
+
+    .error-summary {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--error);
+      border-radius: var(--radius-default);
+      color: var(--error);
+      background: var(--error-subtle);
+    }
+
+    .error-symbol {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--error);
+      border-radius: var(--radius-full);
+      font-weight: 650;
+    }
+
+    .error-copy {
+      min-width: 0;
+    }
+
+    .error-copy strong {
+      display: block;
+      font-size: var(--text-label);
+    }
+
+    .error-links {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: 1px;
+      font-size: var(--text-caption);
+    }
+
+    .error-links a {
+      color: var(--error);
+    }
+
+    .error-impact {
+      max-width: 240px;
+      font-size: var(--text-caption);
+      text-align: right;
+    }
+
+    .evidence-rail {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr 1fr 0.85fr 1.1fr;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--elevation-surface);
+    }
+
+    .rail-step {
+      position: relative;
+      min-width: 0;
+      padding: var(--space-2) var(--space-3);
+      border-left: 1px solid var(--outline);
+    }
+
+    .rail-step:first-child {
+      border-left: 3px solid var(--finance);
+    }
+
+    .rail-step span,
+    .rail-step strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rail-step span {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .rail-step strong {
+      margin-top: var(--space-1);
+      color: var(--on-surface);
+      font-size: var(--text-compact);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rail-arrow {
+      position: absolute;
+      top: 50%;
+      right: -7px;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 14px;
+      height: 14px;
+      margin-top: -7px;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-full);
+      color: var(--on-surface-muted);
+      background: var(--surface);
+      font-size: var(--text-caption);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--context-panel-width);
+      min-width: 0;
+      min-height: 0;
+      gap: var(--space-3);
+    }
+
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--elevation-surface);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      padding: 0 var(--space-4);
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .panel-head strong {
+      font-size: var(--text-label);
+    }
+
+    .panel-head small {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .table-wrap {
+      height: calc(100% - 44px);
+      overflow: auto;
+      scrollbar-color: var(--outline-strong) var(--surface-subtle);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: var(--text-compact);
+    }
+
+    caption {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      height: 34px;
+      padding: 0 var(--space-2);
+      border-bottom: 1px solid var(--outline-strong);
+      color: var(--on-surface-muted);
+      background: var(--surface-subtle);
+      font-size: var(--text-caption);
+      font-weight: 650;
+      text-align: left;
+    }
+
+    tbody tr {
+      height: var(--data-row-height);
+      border-bottom: 1px solid var(--outline);
+      background: var(--surface);
+    }
+
+    tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    tbody tr.selected {
+      box-shadow: inset 3px 0 0 var(--focus);
+      background: var(--primary-subtle);
+    }
+
+    tbody tr.needs-review {
+      background: var(--warning-subtle);
+    }
+
+    tbody td,
+    tbody th {
+      height: var(--data-row-height);
+      padding: var(--space-1) var(--space-2);
+      overflow: hidden;
+      vertical-align: middle;
+    }
+
+    tbody th {
+      font-weight: 650;
+      text-align: left;
+    }
+
+    .field-name {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      align-items: center;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+
+    .field-code {
+      color: var(--finance);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .field-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .number {
+      display: block;
+      overflow: hidden;
+      font-variant-numeric: tabular-nums lining-nums;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .context-line,
+    .value-note {
+      display: block;
+      overflow: hidden;
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .special-value {
+      display: inline-block;
+      padding: 1px var(--space-1);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .special-value.zero {
+      border: 1px solid var(--info);
+      color: var(--info);
+      background: var(--info-subtle);
+    }
+
+    .special-value.null {
+      border: 1px solid var(--error);
+      color: var(--error);
+      background: var(--error-subtle);
+    }
+
+    .special-value.na {
+      border: 1px dashed var(--warning);
+      color: var(--warning);
+      background: var(--warning-subtle);
+    }
+
+    .confidence {
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-variant-numeric: tabular-nums;
+      font-weight: 650;
+    }
+
+    .confidence.low {
+      color: var(--error);
+    }
+
+    .row-action {
+      min-width: 64px;
+      min-height: var(--compact-control-height);
+      padding: 0 var(--space-2);
+      color: var(--primary);
+      background: var(--surface);
+      font-size: var(--text-caption);
+    }
+
+    .pdf-panel {
+      display: grid;
+      grid-template-rows: 44px minmax(0, 1fr) auto;
+    }
+
+    .pdf-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-4);
+      border-bottom: 1px solid var(--outline);
+      background: var(--surface);
+    }
+
+    .pdf-toolbar strong {
+      max-width: 240px;
+      overflow: hidden;
+      font-size: var(--text-label);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page-count {
+      color: var(--on-surface-muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+    }
+
+    .pdf-stage {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: var(--space-3);
+      overflow: hidden;
+      background: var(--surface-subtle);
+    }
+
+    .pdf-page {
+      position: relative;
+      width: 300px;
+      height: 424px;
+      overflow: hidden;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-xs);
+      background: var(--surface);
+      box-shadow: var(--elevation-raised);
+      font-family: var(--font-sans);
+    }
+
+    .pdf-page-header {
+      padding: var(--space-4) var(--space-4) var(--space-2);
+      text-align: center;
+    }
+
+    .pdf-page-header strong {
+      display: block;
+      font-size: var(--text-caption);
+      letter-spacing: 0.02em;
+    }
+
+    .pdf-page-header span {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .pdf-statement-title {
+      margin-top: var(--space-2);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .pdf-unit {
+      padding: 0 var(--space-4);
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+      text-align: right;
+    }
+
+    .pdf-grid {
+      margin: var(--space-2) var(--space-4);
+      border-top: 1px solid var(--outline-strong);
+      font-size: var(--text-caption);
+    }
+
+    .pdf-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 72px 58px;
+      align-items: center;
+      min-height: 22px;
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .pdf-line span {
+      padding: 0 var(--space-1);
+    }
+
+    .pdf-line .pdf-number {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .pdf-line.source-line {
+      position: relative;
+      z-index: 1;
+      min-height: 28px;
+      color: var(--primary);
+      background: var(--primary-subtle);
+      font-weight: 650;
+    }
+
+    .bbox {
+      position: absolute;
+      top: 125px;
+      right: 14px;
+      left: 14px;
+      height: 32px;
+      z-index: 4;
+      border: 2px solid var(--focus);
+      border-radius: var(--radius-sm);
+      pointer-events: none;
+    }
+
+    .bbox-label {
+      position: absolute;
+      top: -18px;
+      right: -2px;
+      padding: 1px var(--space-1);
+      border-radius: var(--radius-sm);
+      color: var(--on-primary);
+      background: var(--focus);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .pdf-footnote {
+      position: absolute;
+      right: var(--space-4);
+      bottom: var(--space-3);
+      left: var(--space-4);
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .source-detail {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      border-top: 1px solid var(--outline);
+      background: var(--surface);
+    }
+
+    .source-detail-copy {
+      min-width: 0;
+    }
+
+    .source-detail-copy strong,
+    .source-detail-copy span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .source-detail-copy strong {
+      font-size: var(--text-compact);
+    }
+
+    .source-detail-copy span {
+      color: var(--on-surface-muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-caption);
+    }
+
+    .review-dock {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-4);
+      min-width: 0;
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--outline-strong);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--elevation-raised);
+    }
+
+    .review-title {
+      min-width: 0;
+    }
+
+    .review-title strong {
+      display: block;
+      font-size: var(--text-heading-sm);
+    }
+
+    .review-title p {
+      margin: 2px 0 0;
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .review-metrics {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+
+    .metric {
+      min-width: 88px;
+      padding: var(--space-2);
+      border-left: 3px solid var(--outline-strong);
+      border-radius: var(--radius-sm);
+      background: var(--surface-subtle);
+    }
+
+    .metric.success {
+      border-left-color: var(--success);
+    }
+
+    .metric.info {
+      border-left-color: var(--info);
+    }
+
+    .metric.error {
+      border-left-color: var(--error);
+    }
+
+    .metric strong,
+    .metric span {
+      display: block;
+    }
+
+    .metric strong {
+      font-family: var(--font-mono);
+      font-size: var(--text-heading-sm);
+      line-height: 1.2;
+    }
+
+    .metric span {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .review-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-2);
+    }
+
+    .disabled-reason {
+      display: block;
+      margin-top: var(--space-1);
+      color: var(--error);
+      font-size: var(--text-caption);
+      text-align: right;
+    }
+
+    .tablet-app {
+      display: grid;
+      grid-template-rows: 64px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .tablet-topbar {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0 var(--space-6);
+      border-bottom: 1px solid var(--outline);
+      background: var(--surface);
+    }
+
+    .menu-button {
+      display: grid;
+      place-items: center;
+      width: var(--touch-target);
+      min-width: var(--touch-target);
+      height: var(--touch-target);
+      padding: 0;
+      font-size: var(--text-heading-sm);
+    }
+
+    .tablet-location {
+      min-width: 0;
+    }
+
+    .tablet-location strong,
+    .tablet-location span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tablet-location strong {
+      font-size: var(--text-label);
+    }
+
+    .tablet-location span {
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .tablet-content {
+      grid-template-rows: 48px 64px 108px 340px 232px 104px;
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .tablet-content .error-summary {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .tablet-content .error-impact {
+      display: none;
+    }
+
+    .tablet-content .error-links {
+      gap: var(--space-3);
+    }
+
+    .tablet-content .evidence-rail {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .tablet-content .rail-step {
+      padding: var(--space-3) var(--space-2);
+    }
+
+    .tablet-content .rail-step strong {
+      white-space: normal;
+    }
+
+    .tablet-fields .table-wrap {
+      height: calc(100% - 44px);
+    }
+
+    .tablet-fields table {
+      min-width: 820px;
+    }
+
+    .tablet-source {
+      display: grid;
+      grid-template-rows: 44px minmax(0, 1fr);
+    }
+
+    .tablet-source-body {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+      background: var(--surface-subtle);
+    }
+
+    .source-snippet {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: var(--space-3);
+      border-right: 1px solid var(--outline);
+    }
+
+    .snippet-page {
+      width: 260px;
+      padding: var(--space-3);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius-xs);
+      background: var(--surface);
+      box-shadow: var(--elevation-surface);
+    }
+
+    .snippet-title {
+      display: flex;
+      justify-content: space-between;
+      color: var(--on-surface-muted);
+      font-size: var(--text-caption);
+    }
+
+    .snippet-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+      padding: var(--space-2);
+      border: 2px solid var(--focus);
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+      background: var(--primary-subtle);
+      font-size: var(--text-caption);
+      font-weight: 650;
+    }
+
+    .snippet-line span:last-child {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .tablet-source-meta {
+      display: grid;
+      align-content: center;
+      gap: var(--space-2);
+      min-width: 0;
+      padding: var(--space-3) var(--space-4);
+      background: var(--surface);
+    }
+
+    .source-pair {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: var(--space-2);
+      font-size: var(--text-caption);
+    }
+
+    .source-pair span {
+      color: var(--on-surface-muted);
+    }
+
+    .source-pair strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tablet-review {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-3);
+    }
+
+    .tablet-review .review-metrics {
+      grid-row: 2;
+    }
+
+    .tablet-review .review-actions {
+      grid-row: 1 / span 2;
+      grid-column: 2;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .tablet-review .metric {
+      min-width: 72px;
+      padding: var(--space-1) var(--space-2);
+    }
+
+    .tablet-review .metric strong {
+      font-size: var(--text-label);
+    }
+
+    .tablet-review .disabled-reason {
+      max-width: 210px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <main aria-label="Đặc tả màn hình chủ chốt S05 Đối chiếu BCTC">
+    <section class="specimen" aria-labelledby="desktop-specimen-title">
+      <div class="specimen-label">
+        <strong id="desktop-specimen-title">S05 · Đối chiếu BCTC — Desktop</strong>
+        <span>1440 × 1024</span>
+      </div>
+
+      <div class="viewport desktop-viewport">
+        <div class="app desktop-app">
+          <aside class="sidebar" aria-label="Điều hướng Hồ sơ phân tích">
+            <div class="brand">
+              <span class="brand-mark" aria-hidden="true">FE</span>
+              <span>FinESG Planner</span>
+            </div>
+
+            <section class="profile-summary" aria-label="Hồ sơ đang mở">
+              <span class="eyebrow">Hồ sơ phân tích · HS-2026-014</span>
+              <strong>Xi măng An Phú · Kế hoạch CapEx 2026</strong>
+              <div class="profile-meta">
+                <span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>Sẵn sàng mô phỏng</span>
+                <span>v12</span>
+              </div>
+            </section>
+
+            <nav class="nav" aria-label="Các bước trong Hồ sơ">
+              <div class="nav-group-label">Chuẩn bị dữ liệu</div>
+              <a href="#desktop-overview"><span class="nav-icon" aria-hidden="true">01</span><span>Tổng quan</span><span class="nav-state">2 lỗi</span></a>
+              <a href="#desktop-fields" aria-current="page"><span class="nav-icon" aria-hidden="true">02</span><span>BCTC</span><span class="nav-state">9/12</span></a>
+              <a href="#desktop-funding"><span class="nav-icon" aria-hidden="true">03</span><span>Kịch bản &amp; tài trợ</span><span class="nav-state">Nháp</span></a>
+              <a href="#desktop-projects"><span class="nav-icon" aria-hidden="true">04</span><span>Dự án</span><span class="nav-state">0/6</span></a>
+              <div class="nav-group-label">Phân tích</div>
+              <a href="#desktop-optimize"><span class="nav-icon" aria-hidden="true">05</span><span>Tối ưu</span><span class="nav-state">Khóa</span></a>
+              <a href="#desktop-results"><span class="nav-icon" aria-hidden="true">06</span><span>Kết quả</span><span class="nav-state">—</span></a>
+              <a href="#desktop-evidence"><span class="nav-icon" aria-hidden="true">07</span><span>Bằng chứng &amp; lịch sử</span><span class="nav-state">v12</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+              Dữ liệu tài chính nhạy cảm · Quyền xem theo Hồ sơ
+            </div>
+          </aside>
+
+          <section class="main-shell">
+            <header class="topbar">
+              <div class="crumbs"><strong>Hồ sơ HS-2026-014</strong> / BCTC / Đối chiếu 12 trường</div>
+              <div class="actor">
+                <div class="actor-copy">
+                  <strong>Lan Nguyễn</strong>
+                  <span>Kế toán trưởng · phiên demo</span>
+                </div>
+                <span class="avatar" aria-hidden="true">LN</span>
+              </div>
+            </header>
+
+            <div class="screen-content desktop-content">
+              <header class="page-head">
+                <div class="page-title">
+                  <h1>Đối chiếu 12 Trường BCTC</h1>
+                  <p>BCTC hợp nhất năm 2025 · PDF có lớp văn bản · 132 trang</p>
+                </div>
+                <div class="head-state" aria-label="Trạng thái bộ dữ liệu">
+                  <span class="badge info"><span class="status-icon" aria-hidden="true">✎</span>Nháp v3</span>
+                  <span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>2 trường chặn</span>
+                </div>
+              </header>
+
+              <section class="error-summary" role="alert" aria-labelledby="desktop-error-title">
+                <span class="error-symbol" aria-hidden="true">!</span>
+                <div class="error-copy">
+                  <strong id="desktop-error-title">2 vấn đề chặn xác nhận toàn bộ 12 trường</strong>
+                  <div class="error-links">
+                    <a href="#d-fs10">FS-10: mức tin cậy 41%, giá trị null</a>
+                    <a href="#d-fs12">FS-12: N/A chưa có lý do ngoại lệ</a>
+                  </div>
+                </div>
+                <div class="error-impact">Không trường chưa xác nhận nào được dùng trong phép tính.</div>
+              </section>
+
+              <section class="evidence-rail" aria-label="Dải bằng chứng cho trường đang chọn FS-01">
+                <div class="rail-step">
+                  <span>1 · Giá trị</span>
+                  <strong>FS-01 · 4.728.342.000.000 VND</strong>
+                  <i class="rail-arrow" aria-hidden="true">›</i>
+                </div>
+                <div class="rail-step">
+                  <span>2 · Nguồn</span>
+                  <strong>Trang 18 · bbox 76,125,210,32</strong>
+                  <i class="rail-arrow" aria-hidden="true">›</i>
+                </div>
+                <div class="rail-step">
+                  <span>3 · Xác nhận</span>
+                  <strong>Nháp · Lan đang xem lại</strong>
+                  <i class="rail-arrow" aria-hidden="true">›</i>
+                </div>
+                <div class="rail-step">
+                  <span>4 · Phiên bản</span>
+                  <strong>BCTC v3 · Hồ sơ v12</strong>
+                  <i class="rail-arrow" aria-hidden="true">›</i>
+                </div>
+                <div class="rail-step">
+                  <span>5 · Tác động</span>
+                  <strong>Chưa dùng trong phép tính</strong>
+                </div>
+              </section>
+
+              <section class="workspace" aria-label="Không gian đối chiếu trường và nguồn PDF">
+                <section class="panel" id="desktop-fields" aria-labelledby="desktop-fields-title">
+                  <header class="panel-head">
+                    <strong id="desktop-fields-title">Bộ dữ liệu tài chính lịch sử</strong>
+                    <small>9 đã xác nhận · 1 nháp · 2 cần kiểm tra</small>
+                  </header>
+                  <div class="table-wrap" tabindex="0" aria-label="Bảng cuộn chứa đúng 12 Trường BCTC">
+                    <table>
+                      <caption>Đúng 12 Trường BCTC của BCTC hợp nhất năm 2025</caption>
+                      <colgroup>
+                        <col style="width: 29%">
+                        <col style="width: 24%">
+                        <col style="width: 19%">
+                        <col style="width: 9%">
+                        <col style="width: 13%">
+                        <col style="width: 6%">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th scope="col">Trường</th>
+                          <th scope="col">Giá trị chuẩn hóa</th>
+                          <th scope="col">Đơn vị · kỳ · phạm vi</th>
+                          <th scope="col">Mức tin cậy</th>
+                          <th scope="col">Trạng thái</th>
+                          <th scope="col"><span class="sr-only">Hành động</span></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="selected" id="d-fs01" aria-selected="true">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-01</span><span class="field-label">Tiền và tương đương tiền</span></span></th>
+                          <td><span class="number">4.728.342.000.000</span><span class="value-note">Giá trị gốc: 4.728.342</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence" aria-label="Mức tin cậy trích xuất 98 phần trăm">98%</span></td>
+                          <td><span class="badge info"><span class="status-icon" aria-hidden="true">✎</span>Nháp</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-01">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs02">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-02</span><span class="field-label">Tài sản ngắn hạn</span></span></th>
+                          <td><span class="number">18.942.118.000.000</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">99%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-02">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs03">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-03</span><span class="field-label">Nợ ngắn hạn</span></span></th>
+                          <td><span class="number">11.206.450.000.000</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">97%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-03">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs04">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-04</span><span class="field-label">Vay ngắn hạn</span></span></th>
+                          <td><span class="number">3.250.000.000.000</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">96%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-04">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs05">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-05</span><span class="field-label">Vay dài hạn</span></span></th>
+                          <td><span class="number">8.740.000.000.000</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">99%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-05">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs06">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-06</span><span class="field-label">Tổng nợ phải trả</span></span></th>
+                          <td><span class="number">22.180.000.000.000</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">99%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-06">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs07">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-07</span><span class="field-label">Vốn chủ sở hữu</span></span></th>
+                          <td><span class="number">17.920.000.000.000</span></td>
+                          <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">98%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-07">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs08">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-08</span><span class="field-label">Doanh thu thuần</span></span></th>
+                          <td><span class="number">28.450.000.000.000</span></td>
+                          <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">97%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-08">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs09">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-09</span><span class="field-label">Lợi nhuận trước thuế</span></span></th>
+                          <td><span class="special-value zero">0</span><span class="value-note">Giá trị bằng 0, không phải thiếu</span></td>
+                          <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">96%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-09">Nguồn</button></td>
+                        </tr>
+                        <tr class="needs-review" id="d-fs10">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-10</span><span class="field-label">Chi phí lãi vay</span></span></th>
+                          <td><span class="special-value null">null</span><span class="value-note">Không trích được giá trị</span></td>
+                          <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence low" aria-label="Mức tin cậy trích xuất thấp, 41 phần trăm">41%</span><span class="value-note">Thấp</span></td>
+                          <td><span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>Cần kiểm tra</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-10">Nguồn</button></td>
+                        </tr>
+                        <tr id="d-fs11">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-11</span><span class="field-label">Lợi nhuận sau thuế</span></span></th>
+                          <td><span class="number">1.486.200.000.000</span></td>
+                          <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">98%</span></td>
+                          <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-11">Nguồn</button></td>
+                        </tr>
+                        <tr class="needs-review" id="d-fs12">
+                          <th scope="row"><span class="field-name"><span class="field-code">FS-12</span><span class="field-label">Lưu chuyển tiền thuần từ HĐKD</span></span></th>
+                          <td><span class="special-value na">N/A</span><span class="value-note">Không áp dụng, chưa có lý do</span></td>
+                          <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                          <td><span class="confidence">94%</span></td>
+                          <td><span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>Cần kiểm tra</span></td>
+                          <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-12">Nguồn</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+
+                <aside class="panel pdf-panel" aria-labelledby="desktop-source-title">
+                  <header class="pdf-toolbar">
+                    <strong id="desktop-source-title">BCTC_HopNhat_2025_v3.pdf</strong>
+                    <span class="page-count">Trang 18 / 132</span>
+                  </header>
+                  <div class="pdf-stage">
+                    <div class="pdf-page" role="img" aria-label="Trang 18 của BCTC. Vùng nguồn của FS-01 Tiền và tương đương tiền được đánh dấu tại dòng có giá trị 4.728.342 triệu đồng.">
+                      <div class="pdf-page-header">
+                        <strong>CÔNG TY CỔ PHẦN XI MĂNG AN PHÚ</strong>
+                        <span>Báo cáo tài chính hợp nhất cho năm kết thúc ngày 31 tháng 12 năm 2025</span>
+                        <div class="pdf-statement-title">BẢNG CÂN ĐỐI KẾ TOÁN HỢP NHẤT</div>
+                      </div>
+                      <div class="pdf-unit">Đơn vị: triệu đồng</div>
+                      <div class="pdf-grid" aria-hidden="true">
+                        <div class="pdf-line"><span>Chỉ tiêu</span><span class="pdf-number">31/12/2025</span><span class="pdf-number">01/01/2025</span></div>
+                        <div class="pdf-line"><span>A. TÀI SẢN NGẮN HẠN</span><span class="pdf-number">18.942.118</span><span class="pdf-number">17.406.220</span></div>
+                        <div class="pdf-line source-line"><span>I. Tiền và các khoản tương đương tiền</span><span class="pdf-number">4.728.342</span><span class="pdf-number">3.916.008</span></div>
+                        <div class="pdf-line"><span>1. Tiền</span><span class="pdf-number">1.246.330</span><span class="pdf-number">1.018.412</span></div>
+                        <div class="pdf-line"><span>2. Các khoản tương đương tiền</span><span class="pdf-number">3.482.012</span><span class="pdf-number">2.897.596</span></div>
+                        <div class="pdf-line"><span>II. Đầu tư tài chính ngắn hạn</span><span class="pdf-number">2.104.550</span><span class="pdf-number">1.882.407</span></div>
+                        <div class="pdf-line"><span>III. Các khoản phải thu ngắn hạn</span><span class="pdf-number">5.438.996</span><span class="pdf-number">5.187.264</span></div>
+                        <div class="pdf-line"><span>IV. Hàng tồn kho</span><span class="pdf-number">6.126.015</span><span class="pdf-number">5.902.378</span></div>
+                      </div>
+                      <div class="bbox" aria-hidden="true"><span class="bbox-label">FS-01 · bbox</span></div>
+                      <div class="pdf-footnote">Các thuyết minh kèm theo là bộ phận hợp thành của báo cáo tài chính hợp nhất này.</div>
+                    </div>
+                  </div>
+                  <div class="source-detail">
+                    <div class="source-detail-copy">
+                      <strong>Giá trị gốc 4.728.342 triệu đồng → chuẩn hóa 4.728.342.000.000 VND</strong>
+                      <span>bbox x=76 y=125 w=210 h=32 · text-layer · Confidence 98%</span>
+                    </div>
+                    <button class="primary compact" type="button">Xác nhận FS-01</button>
+                  </div>
+                </aside>
+              </section>
+
+              <section class="review-dock" aria-labelledby="desktop-review-title">
+                <div class="review-title">
+                  <span class="eyebrow">Xem lại trước khi xác nhận có hậu quả</span>
+                  <strong id="desktop-review-title">Xác nhận toàn bộ 12 Trường BCTC</strong>
+                  <p>Phạm vi: BCTC hợp nhất 2025 · BCTC v3 → Bộ dữ liệu tài chính lịch sử v4. Người xác nhận dự kiến: Lan Nguyễn.</p>
+                </div>
+                <div class="review-metrics" aria-label="Tóm tắt phạm vi xác nhận">
+                  <div class="metric success"><strong>9</strong><span>Đã xác nhận</span></div>
+                  <div class="metric info"><strong>1</strong><span>Nháp sẵn sàng</span></div>
+                  <div class="metric error"><strong>2</strong><span>Lỗi chặn</span></div>
+                </div>
+                <div>
+                  <div class="review-actions">
+                    <button type="button">Quay lại sửa</button>
+                    <button type="button" disabled aria-describedby="desktop-disabled-reason">Xác nhận toàn bộ 12 trường</button>
+                  </div>
+                  <span class="disabled-reason" id="desktop-disabled-reason">Hãy xử lý FS-10 và FS-12 trước.</span>
+                </div>
+              </section>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="tablet-specimen-title">
+      <div class="specimen-label">
+        <strong id="tablet-specimen-title">S05 · Đối chiếu BCTC — Tablet</strong>
+        <span>900 × 1100</span>
+      </div>
+
+      <div class="viewport tablet-viewport">
+        <div class="app tablet-app">
+          <header class="tablet-topbar">
+            <button class="menu-button" type="button" aria-label="Mở điều hướng Hồ sơ">☰</button>
+            <div class="tablet-location">
+              <strong>FinESG Planner · BCTC</strong>
+              <span>HS-2026-014 · Xi măng An Phú · v12</span>
+            </div>
+            <span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>2 trường chặn</span>
+          </header>
+
+          <div class="screen-content tablet-content">
+            <header class="page-head">
+              <div class="page-title">
+                <h1>Đối chiếu 12 Trường BCTC</h1>
+                <p>FS-01 đang chọn · mở nguồn theo luồng tuần tự</p>
+              </div>
+              <span class="badge info"><span class="status-icon" aria-hidden="true">✎</span>Nháp v3</span>
+            </header>
+
+            <section class="error-summary" role="alert" aria-labelledby="tablet-error-title">
+              <span class="error-symbol" aria-hidden="true">!</span>
+              <div class="error-copy">
+                <strong id="tablet-error-title">2 vấn đề chặn xác nhận toàn bộ</strong>
+                <div class="error-links">
+                  <a href="#t-fs10">FS-10 · null · 41%</a>
+                  <a href="#t-fs12">FS-12 · N/A chưa có lý do</a>
+                </div>
+              </div>
+            </section>
+
+            <section class="evidence-rail" aria-label="Dải bằng chứng cho trường đang chọn FS-01 trên tablet">
+              <div class="rail-step">
+                <span>1 · Giá trị</span>
+                <strong>FS-01<br>4.728.342.000.000 VND</strong>
+                <i class="rail-arrow" aria-hidden="true">›</i>
+              </div>
+              <div class="rail-step">
+                <span>2 · Nguồn</span>
+                <strong>Trang 18<br>bbox 76,125,210,32</strong>
+                <i class="rail-arrow" aria-hidden="true">›</i>
+              </div>
+              <div class="rail-step">
+                <span>3 · Xác nhận</span>
+                <strong>Nháp<br>Lan đang xem lại</strong>
+                <i class="rail-arrow" aria-hidden="true">›</i>
+              </div>
+              <div class="rail-step">
+                <span>4 · Phiên bản</span>
+                <strong>BCTC v3<br>Hồ sơ v12</strong>
+                <i class="rail-arrow" aria-hidden="true">›</i>
+              </div>
+              <div class="rail-step">
+                <span>5 · Tác động</span>
+                <strong>Chưa dùng<br>trong phép tính</strong>
+              </div>
+            </section>
+
+            <section class="panel tablet-fields" aria-labelledby="tablet-fields-title">
+              <header class="panel-head">
+                <strong id="tablet-fields-title">Đúng 12 Trường BCTC</strong>
+                <small>9 xác nhận · 1 nháp · 2 cần kiểm tra</small>
+              </header>
+              <div class="table-wrap" tabindex="0" aria-label="Bảng cuộn ngang và dọc chứa đúng 12 Trường BCTC">
+                <table>
+                  <caption>Đúng 12 Trường BCTC trên tablet</caption>
+                  <colgroup>
+                    <col style="width: 220px">
+                    <col style="width: 190px">
+                    <col style="width: 165px">
+                    <col style="width: 80px">
+                    <col style="width: 125px">
+                    <col style="width: 70px">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th scope="col">Trường</th>
+                      <th scope="col">Giá trị chuẩn hóa</th>
+                      <th scope="col">Đơn vị · kỳ · phạm vi</th>
+                      <th scope="col">Tin cậy</th>
+                      <th scope="col">Trạng thái</th>
+                      <th scope="col"><span class="sr-only">Hành động</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="selected" id="t-fs01" aria-selected="true">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-01</span><span class="field-label">Tiền và tương đương tiền</span></span></th>
+                      <td><span class="number">4.728.342.000.000</span><span class="value-note">Gốc: 4.728.342</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">98%</span></td>
+                      <td><span class="badge info"><span class="status-icon" aria-hidden="true">✎</span>Nháp</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-01 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs02">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-02</span><span class="field-label">Tài sản ngắn hạn</span></span></th>
+                      <td><span class="number">18.942.118.000.000</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">99%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-02 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs03">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-03</span><span class="field-label">Nợ ngắn hạn</span></span></th>
+                      <td><span class="number">11.206.450.000.000</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">97%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-03 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs04">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-04</span><span class="field-label">Vay ngắn hạn</span></span></th>
+                      <td><span class="number">3.250.000.000.000</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">96%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-04 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs05">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-05</span><span class="field-label">Vay dài hạn</span></span></th>
+                      <td><span class="number">8.740.000.000.000</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">99%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-05 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs06">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-06</span><span class="field-label">Tổng nợ phải trả</span></span></th>
+                      <td><span class="number">22.180.000.000.000</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">99%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-06 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs07">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-07</span><span class="field-label">Vốn chủ sở hữu</span></span></th>
+                      <td><span class="number">17.920.000.000.000</span></td>
+                      <td><span class="context-line">VND · 31/12/2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">98%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-07 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs08">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-08</span><span class="field-label">Doanh thu thuần</span></span></th>
+                      <td><span class="number">28.450.000.000.000</span></td>
+                      <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">97%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-08 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs09">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-09</span><span class="field-label">Lợi nhuận trước thuế</span></span></th>
+                      <td><span class="special-value zero">0</span><span class="value-note">Giá trị bằng 0</span></td>
+                      <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">96%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-09 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr class="needs-review" id="t-fs10">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-10</span><span class="field-label">Chi phí lãi vay</span></span></th>
+                      <td><span class="special-value null">null</span><span class="value-note">Không trích được</span></td>
+                      <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence low">41%</span><span class="value-note">Thấp</span></td>
+                      <td><span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>Cần kiểm tra</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-10 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr id="t-fs11">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-11</span><span class="field-label">Lợi nhuận sau thuế</span></span></th>
+                      <td><span class="number">1.486.200.000.000</span></td>
+                      <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">98%</span></td>
+                      <td><span class="badge success"><span class="status-icon" aria-hidden="true">✓</span>Đã xác nhận</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-11 trên tablet">Nguồn</button></td>
+                    </tr>
+                    <tr class="needs-review" id="t-fs12">
+                      <th scope="row"><span class="field-name"><span class="field-code">FS-12</span><span class="field-label">Lưu chuyển tiền thuần từ HĐKD</span></span></th>
+                      <td><span class="special-value na">N/A</span><span class="value-note">Chưa có lý do ngoại lệ</span></td>
+                      <td><span class="context-line">VND · Năm 2025</span><span class="context-line">Hợp nhất · triệu đồng</span></td>
+                      <td><span class="confidence">94%</span></td>
+                      <td><span class="badge warning"><span class="status-icon" aria-hidden="true">!</span>Cần kiểm tra</span></td>
+                      <td><button class="row-action" type="button" aria-label="Mở nguồn của FS-12 trên tablet">Nguồn</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel tablet-source" aria-labelledby="tablet-source-title">
+              <header class="panel-head">
+                <strong id="tablet-source-title">Nguồn của FS-01 · Trang 18 / 132</strong>
+                <button class="compact" type="button">Quay lại trường FS-01</button>
+              </header>
+              <div class="tablet-source-body">
+                <div class="source-snippet">
+                  <div class="snippet-page" role="img" aria-label="Đoạn nguồn trên trang 18. Dòng Tiền và các khoản tương đương tiền có giá trị 4.728.342 triệu đồng được đánh dấu.">
+                    <div class="snippet-title"><span>BẢNG CÂN ĐỐI KẾ TOÁN HỢP NHẤT</span><span>triệu đồng</span></div>
+                    <div class="snippet-line" aria-hidden="true"><span>I. Tiền và các khoản tương đương tiền</span><span>4.728.342</span></div>
+                  </div>
+                </div>
+                <div class="tablet-source-meta">
+                  <div class="source-pair"><span>Giá trị gốc</span><strong>4.728.342 triệu đồng</strong></div>
+                  <div class="source-pair"><span>Chuẩn hóa</span><strong>4.728.342.000.000 VND</strong></div>
+                  <div class="source-pair"><span>Kỳ · phạm vi</span><strong>31/12/2025 · Hợp nhất</strong></div>
+                  <div class="source-pair"><span>Vùng nguồn</span><strong>bbox x=76 y=125 w=210 h=32</strong></div>
+                  <div class="source-pair"><span>Trích xuất</span><strong>text-layer · Confidence 98%</strong></div>
+                  <button class="primary compact" type="button">Xác nhận FS-01</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="review-dock tablet-review" aria-labelledby="tablet-review-title">
+              <div class="review-title">
+                <span class="eyebrow">Xem lại theo phạm vi</span>
+                <strong id="tablet-review-title">Xác nhận toàn bộ 12 trường</strong>
+                <p>BCTC v3 → Bộ dữ liệu v4 · Lan Nguyễn</p>
+              </div>
+              <div class="review-metrics" aria-label="Tóm tắt phạm vi xác nhận trên tablet">
+                <div class="metric success"><strong>9</strong><span>Xác nhận</span></div>
+                <div class="metric info"><strong>1</strong><span>Nháp</span></div>
+                <div class="metric error"><strong>2</strong><span>Lỗi chặn</span></div>
+              </div>
+              <div class="review-actions">
+                <button type="button">Quay lại sửa</button>
+                <button type="button" disabled aria-describedby="tablet-disabled-reason">Xác nhận 12 trường</button>
+                <span class="disabled-reason" id="tablet-disabled-reason">Xử lý FS-10 và FS-12 trước.</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

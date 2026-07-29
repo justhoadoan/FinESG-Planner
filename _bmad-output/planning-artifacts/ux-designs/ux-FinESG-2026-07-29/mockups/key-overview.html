@@ -1,0 +1,1140 @@
+<!-- Governing spines: DESIGN.md §Brand & Style, §Colors, §Typography, §Layout & Spacing, §Elevation & Depth, §Shapes, §Components; EXPERIENCE.md §Information Architecture (S03), §Readiness/Confirmation/Version Contract, §Voice and Tone, §Component Patterns, §State Patterns, §Accessibility Floor. -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FinESG Planner — Tổng quan & mức sẵn sàng</title>
+  <style>
+    /* Governing spine sections are named in the document-level comment above. */
+    :root {
+      --background: #F5F7FA;
+      --surface: #FFFFFF;
+      --surface-subtle: #EEF2F6;
+      --surface-strong: #E2E8F0;
+      --on-surface: #172033;
+      --on-surface-muted: #526075;
+      --outline: #7A8798;
+      --outline-strong: #526075;
+      --primary: #164E63;
+      --primary-hover: #0F3F50;
+      --primary-subtle: #DDF1F4;
+      --on-primary: #FFFFFF;
+      --finance: #315C9B;
+      --carbon: #227354;
+      --risk: #8A3F67;
+      --debt: #925C2D;
+      --info: #2457A6;
+      --info-subtle: #E8F0FC;
+      --success: #19704E;
+      --success-subtle: #E5F4EC;
+      --warning: #8A5A00;
+      --warning-subtle: #FFF3D6;
+      --estimated: #7A4E00;
+      --estimated-subtle: #FFF7E6;
+      --error: #B42318;
+      --error-subtle: #FDECEA;
+      --simulation: #6941C6;
+      --simulation-subtle: #F0EBFF;
+      --verified: #1F5A78;
+      --verified-subtle: #E5F1F7;
+      --focus: #1D4ED8;
+      --disabled: #97A3B2;
+      --shadow-surface: 0 1px 2px rgba(23, 32, 51, 0.06);
+      --shadow-raised: 0 8px 24px rgba(23, 32, 51, 0.10);
+      --focus-ring: 0 0 0 3px rgba(29, 78, 216, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-width: 1440px;
+      height: 100%;
+      min-height: 1024px;
+      margin: 0;
+      background: var(--background);
+      color: var(--on-surface);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--outline);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--on-surface);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .browser-frame {
+      width: 1440px;
+      height: 1024px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--outline-strong);
+    }
+
+    .browser-chrome {
+      height: 40px;
+      display: grid;
+      grid-template-columns: 112px 1fr 112px;
+      align-items: center;
+      padding: 0 12px;
+      gap: 12px;
+      background: var(--surface-strong);
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .window-dot {
+      width: 12px;
+      height: 12px;
+      border: 1px solid var(--outline-strong);
+      border-radius: 9999px;
+      background: var(--surface);
+    }
+
+    .address-bar {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--outline);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--on-surface-muted);
+      font-size: 12px;
+    }
+
+    .browser-actions {
+      text-align: right;
+      color: var(--on-surface-muted);
+      letter-spacing: 4px;
+    }
+
+    .app {
+      height: calc(100% - 40px);
+      display: grid;
+      grid-template-columns: 272px 1fr;
+      grid-template-rows: 60px 1fr;
+      background: var(--background);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      background: var(--surface);
+      border-right: 1px solid var(--outline);
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-name {
+      font-size: 16px;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      color: var(--on-surface-muted);
+      font-size: 12px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px 0 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--on-surface-muted);
+      font-size: 13px;
+    }
+
+    .breadcrumb strong {
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-copy {
+      text-align: right;
+      line-height: 1.3;
+    }
+
+    .user-copy strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .user-copy span {
+      color: var(--on-surface-muted);
+      font-size: 12px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 9999px;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-weight: 650;
+    }
+
+    .sidebar {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      padding: 16px 12px;
+      background: var(--surface);
+      border-right: 1px solid var(--outline);
+    }
+
+    .case-context {
+      padding: 4px 8px 16px;
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .eyebrow {
+      color: var(--on-surface-muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .case-context strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .case-context span {
+      display: block;
+      margin-top: 2px;
+      color: var(--on-surface-muted);
+      font-size: 12px;
+    }
+
+    .nav-label {
+      margin: 16px 8px 8px;
+      color: var(--on-surface-muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-item {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border-radius: 6px;
+      color: var(--on-surface);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .nav-item.active {
+      background: var(--primary-subtle);
+      box-shadow: inset 3px 0 0 var(--primary);
+      color: var(--primary);
+      font-weight: 650;
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--outline);
+      border-radius: 4px;
+      color: var(--on-surface-muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .active .nav-icon {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .nav-state {
+      min-width: 22px;
+      min-height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 9999px;
+      color: var(--on-surface-muted);
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .nav-state.done {
+      background: var(--success-subtle);
+      color: var(--success);
+    }
+
+    .nav-state.review {
+      background: var(--warning-subtle);
+      color: var(--warning);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px 8px 4px;
+      border-top: 1px solid var(--outline);
+      color: var(--on-surface-muted);
+      font-size: 12px;
+    }
+
+    .sidebar-footer strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .main {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: var(--background);
+    }
+
+    .evidence-rail {
+      height: 64px;
+      display: grid;
+      grid-template-columns: 1.2fr 1.25fr 1.2fr 0.72fr 1.38fr;
+      padding: 0 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--outline);
+      box-shadow: var(--shadow-surface);
+    }
+
+    .rail-item {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 18px;
+      border-left: 1px solid var(--outline);
+    }
+
+    .rail-item:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .rail-item:last-child {
+      padding-right: 0;
+    }
+
+    .rail-label {
+      color: var(--on-surface-muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .rail-value {
+      overflow: hidden;
+      margin-top: 2px;
+      color: var(--on-surface);
+      font-size: 12px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rail-item.attention .rail-value {
+      color: var(--warning);
+    }
+
+    .content {
+      height: calc(100% - 64px);
+      padding: 20px 32px;
+      overflow: hidden;
+    }
+
+    .page-heading {
+      display: flex;
+      min-height: 52px;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 12px;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 650;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .page-heading p {
+      margin-top: 4px;
+      color: var(--on-surface-muted);
+      font-size: 13px;
+    }
+
+    .heading-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .button-primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .button-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .button-compact {
+      min-height: 44px;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+
+    .readiness-ledger {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 12px;
+      border: 1px solid var(--outline);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow-surface);
+    }
+
+    .axis {
+      min-width: 0;
+      padding: 14px 16px;
+    }
+
+    .axis + .axis {
+      border-left: 1px solid var(--outline);
+    }
+
+    .axis-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .axis-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .axis-symbol {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      font-weight: 650;
+    }
+
+    .axis.finance .axis-symbol {
+      background: var(--info-subtle);
+      color: var(--finance);
+    }
+
+    .axis.carbon .axis-symbol {
+      background: var(--success-subtle);
+      color: var(--carbon);
+    }
+
+    .status {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .status.success {
+      background: var(--success-subtle);
+      color: var(--success);
+    }
+
+    .status.warning {
+      background: var(--warning-subtle);
+      color: var(--warning);
+    }
+
+    .status.simulation {
+      background: var(--simulation-subtle);
+      color: var(--simulation);
+    }
+
+    .status.info {
+      background: var(--info-subtle);
+      color: var(--info);
+    }
+
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      display: grid;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 9999px;
+      font-size: 9px;
+      line-height: 1;
+    }
+
+    .axis-track {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .axis-segment {
+      height: 5px;
+      border-radius: 2px;
+      background: var(--surface-strong);
+    }
+
+    .axis-segment.complete {
+      background: var(--success);
+    }
+
+    .axis-segment.review {
+      background: var(--warning);
+    }
+
+    .axis-detail {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 8px;
+      color: var(--on-surface-muted);
+      font-size: 12px;
+    }
+
+    .axis-detail strong {
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .output-ledger {
+      display: grid;
+      grid-template-columns: 188px 180px 1fr 132px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      border: 1px solid var(--outline);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .output-label {
+      grid-row: 1 / span 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 16px;
+      background: var(--surface-subtle);
+      border-right: 1px solid var(--outline);
+    }
+
+    .output-label strong {
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .output-label span {
+      margin-top: 3px;
+      color: var(--on-surface-muted);
+      font-size: 11px;
+    }
+
+    .output-cell {
+      min-width: 0;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--outline);
+      font-size: 12px;
+    }
+
+    .output-cell:nth-last-child(-n + 3) {
+      border-bottom: 0;
+    }
+
+    .output-name {
+      gap: 8px;
+      font-weight: 650;
+    }
+
+    .output-description {
+      color: var(--on-surface-muted);
+    }
+
+    .output-action {
+      justify-content: flex-end;
+    }
+
+    .checklist {
+      overflow: hidden;
+      border: 1px solid var(--outline);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow-surface);
+    }
+
+    .checklist-header {
+      min-height: 36px;
+      display: grid;
+      grid-template-columns: 1.35fr 1.45fr 0.72fr 0.86fr 112px;
+      align-items: center;
+      padding: 0 14px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--outline);
+      color: var(--on-surface-muted);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .group-row {
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--outline);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .group-row.finance {
+      box-shadow: inset 3px 0 0 var(--finance);
+    }
+
+    .group-row.carbon {
+      box-shadow: inset 3px 0 0 var(--carbon);
+    }
+
+    .group-row span {
+      color: var(--on-surface-muted);
+      font-weight: 500;
+    }
+
+    .check-row {
+      min-height: 42px;
+      display: grid;
+      grid-template-columns: 1.35fr 1.45fr 0.72fr 0.86fr 112px;
+      align-items: center;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--outline);
+      font-size: 12px;
+    }
+
+    .check-row:last-child {
+      border-bottom: 0;
+    }
+
+    .check-title {
+      min-width: 0;
+      padding-right: 12px;
+      overflow: hidden;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .check-evidence {
+      min-width: 0;
+      padding-right: 12px;
+      overflow: visible;
+      color: var(--on-surface-muted);
+      overflow-wrap: anywhere;
+      text-overflow: clip;
+      white-space: normal;
+    }
+
+    .owner {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--on-surface);
+    }
+
+    .owner-initial {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 9999px;
+      background: var(--surface-subtle);
+      color: var(--on-surface-muted);
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .row-action {
+      min-height: 44px;
+      justify-self: end;
+      padding: 0 8px;
+      border-color: transparent;
+      background: transparent;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 650;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .stale-banner {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 6px 12px;
+      border: 1px solid var(--warning);
+      border-radius: 6px;
+      background: var(--warning-subtle);
+      color: var(--warning);
+      font-size: 12px;
+    }
+
+    .stale-icon {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--warning);
+      border-radius: 9999px;
+      font-weight: 650;
+    }
+
+    .stale-banner strong {
+      font-weight: 650;
+    }
+
+    .stale-banner span {
+      color: var(--on-surface);
+    }
+
+    .stale-action {
+      min-height: 44px;
+      border-color: var(--warning);
+      background: var(--warning-subtle);
+      color: var(--warning);
+      font-size: 12px;
+    }
+
+    .mono,
+    .number {
+      font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+
+    /* Meaningful interface text never drops below the 12px accessibility floor. */
+    .nav-state,
+    .rail-label,
+    .status,
+    .output-label span,
+    .checklist-header,
+    .owner-initial {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="browser-frame">
+    <div class="browser-chrome" aria-hidden="true">
+      <div class="window-controls">
+        <span class="window-dot"></span>
+        <span class="window-dot"></span>
+        <span class="window-dot"></span>
+      </div>
+      <div class="address-bar">
+        <span>▣</span>
+        <span>finesg.local/ho-so/HSP-26-014/tong-quan</span>
+      </div>
+      <div class="browser-actions">— □ ⋮</div>
+    </div>
+
+    <div class="app">
+      <div class="brand">
+        <div class="brand-mark">FE</div>
+        <div>
+          <div class="brand-name">FinESG Planner</div>
+          <div class="brand-subtitle">Sàng lọc CapEx xanh</div>
+        </div>
+      </div>
+
+      <header class="app-header">
+        <div class="breadcrumb" aria-label="Đường dẫn">
+          <span>Hồ sơ phân tích</span>
+          <span aria-hidden="true">/</span>
+          <span class="mono">HSP-26-014</span>
+          <span aria-hidden="true">/</span>
+          <strong>Tổng quan</strong>
+        </div>
+        <div class="user">
+          <div class="user-copy">
+            <strong>Minh Nguyễn</strong>
+            <span>CFO · Chủ Hồ sơ</span>
+          </div>
+          <div class="avatar" aria-hidden="true">MN</div>
+        </div>
+      </header>
+
+      <aside class="sidebar">
+        <div class="case-context">
+          <div class="eyebrow">Hồ sơ đang mở</div>
+          <strong>Xi măng Đông Sơn</strong>
+          <span>Xi măng · Ngày gốc <time datetime="2025-12-31">31/12/2025</time></span>
+        </div>
+
+        <div class="nav-label">Chuẩn bị & quyết định</div>
+        <nav aria-label="Điều hướng Hồ sơ">
+          <ul class="nav-list">
+            <li><a class="nav-item active" href="#overview" aria-current="page">
+              <span class="nav-icon" aria-hidden="true">01</span>
+              <span>Tổng quan</span>
+              <span class="nav-state" aria-hidden="true">•</span>
+            </a></li>
+            <li><a class="nav-item" href="#bctc">
+              <span class="nav-icon" aria-hidden="true">02</span>
+              <span>BCTC</span>
+              <span class="nav-state done" aria-label="Đã hoàn tất">✓</span>
+            </a></li>
+            <li><a class="nav-item" href="#scenario">
+              <span class="nav-icon" aria-hidden="true">03</span>
+              <span>Kịch bản & tài trợ</span>
+              <span class="nav-state done" aria-label="Đã hoàn tất">✓</span>
+            </a></li>
+            <li><a class="nav-item" href="#projects">
+              <span class="nav-icon" aria-hidden="true">04</span>
+              <span>Dự án</span>
+              <span class="nav-state review" aria-label="Hai mục cần kiểm tra">2</span>
+            </a></li>
+            <li><a class="nav-item" href="#optimize">
+              <span class="nav-icon" aria-hidden="true">05</span>
+              <span>Tối ưu</span>
+              <span class="nav-state" aria-label="Chưa bắt đầu">○</span>
+            </a></li>
+            <li><a class="nav-item" href="#results">
+              <span class="nav-icon" aria-hidden="true">06</span>
+              <span>Kết quả</span>
+              <span class="nav-state" aria-label="Chưa có kết quả">○</span>
+            </a></li>
+            <li><a class="nav-item" href="#evidence">
+              <span class="nav-icon" aria-hidden="true">07</span>
+              <span>Bằng chứng & lịch sử</span>
+              <span class="nav-state" aria-label="Chưa có mục mới">○</span>
+            </a></li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+          <strong>Phạm vi dữ liệu</strong>
+          Hợp nhất · <abbr title="Đồng Việt Nam">VND</abbr><span class="sr-only">, đồng Việt Nam</span> · FY2025
+        </div>
+      </aside>
+
+      <main class="main" id="overview">
+        <section class="evidence-rail" aria-label="Dải bằng chứng của Hồ sơ">
+          <div class="rail-item">
+            <span class="rail-label">Giá trị</span>
+            <span class="rail-value">12 <abbr title="Báo cáo tài chính">BCTC</abbr><span class="sr-only">, báo cáo tài chính</span> · 5 Dự án · 2 Gói vay</span>
+          </div>
+          <div class="rail-item">
+            <span class="rail-label">Nguồn</span>
+            <span class="rail-value">BCTC FY2025 · 5 bộ hồ sơ Dự án</span>
+          </div>
+          <div class="rail-item">
+            <span class="rail-label">Xác nhận</span>
+            <span class="rail-value">Lan & Minh đã xong · Thảo 3/5</span>
+          </div>
+          <div class="rail-item">
+            <span class="rail-label">Phiên bản</span>
+            <span class="rail-value mono">Đầu vào v7</span>
+          </div>
+          <div class="rail-item attention">
+            <span class="rail-label">Tác động đến lần chạy</span>
+            <span class="rail-value">Tài chính sẵn sàng · CO₂ còn 2 việc</span>
+          </div>
+        </section>
+
+        <div class="content">
+          <div class="page-heading">
+            <div>
+              <h1>Tổng quan & mức sẵn sàng</h1>
+              <p>Đầu vào tài chính đã đủ cho phân tích 12 tháng. Hai phiếu CO₂ chưa đủ điều kiện cho mục tiêu chính.</p>
+            </div>
+            <div class="heading-actions">
+              <button type="button">Xem 2 việc CO₂</button>
+              <button class="button-primary" type="button">Cấu hình lần chạy</button>
+            </div>
+          </div>
+
+          <section class="readiness-ledger" aria-label="Hai trục sẵn sàng độc lập">
+            <article class="axis finance">
+              <div class="axis-header">
+                <div class="axis-title">
+                  <span class="axis-symbol" aria-hidden="true">₫</span>
+                  <span>Trục tài chính</span>
+                </div>
+                <span class="status success">
+                  <span class="status-dot" aria-hidden="true">✓</span>
+                  Sẵn sàng tài chính 12 tháng
+                </span>
+              </div>
+              <div class="axis-track" aria-label="5 trên 5 hạng mục tài chính đã hoàn tất">
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment complete"></span>
+              </div>
+              <div class="axis-detail">
+                <span><strong>5/5 hạng mục</strong> đã xác nhận</span>
+                <span>Lan · Minh</span>
+              </div>
+            </article>
+
+            <article class="axis carbon">
+              <div class="axis-header">
+                <div class="axis-title">
+                  <span class="axis-symbol" aria-hidden="true">CO₂</span>
+                  <span>Trục CO₂ & bằng chứng</span>
+                </div>
+                <span class="status warning">
+                  <span class="status-dot" aria-hidden="true">!</span>
+                  2 mục cần kiểm tra
+                </span>
+              </div>
+              <div class="axis-track" aria-label="Ba trên năm phiếu CO2 đã xác nhận, hai phiếu cần kiểm tra">
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment complete"></span>
+                <span class="axis-segment review"></span>
+                <span class="axis-segment review"></span>
+              </div>
+              <div class="axis-detail">
+                <span><strong>3/5 phiếu</strong> được dùng trong mục tiêu chính</span>
+                <span>Thảo · ESG/MRV</span>
+              </div>
+            </article>
+          </section>
+
+          <section class="output-ledger" aria-label="Phân biệt hai loại đầu ra">
+            <div class="output-label">
+              <strong>Loại đầu ra</strong>
+              <span>Không phải trạng thái Hồ sơ</span>
+            </div>
+            <div class="output-cell output-name">
+              <span class="status simulation">Mô phỏng</span>
+              <span>Sàng lọc mô phỏng</span>
+            </div>
+            <div class="output-cell output-description">Dùng khi chọn dữ liệu Ước tính/Mô phỏng; kết quả và báo cáo luôn có watermark.</div>
+            <div class="output-cell output-action"><span class="status info">Có thể cấu hình</span></div>
+            <div class="output-cell output-name">
+              <span class="status success">Đã xác nhận</span>
+              <span>Phân tích tài chính 12 tháng</span>
+            </div>
+            <div class="output-cell output-description">Đầu vào tài chính đã đủ; CO₂ chưa xác nhận bị loại khỏi mục tiêu/ràng buộc chính.</div>
+            <div class="output-cell output-action"><span class="status success">Sẵn sàng</span></div>
+          </section>
+
+          <section class="checklist" aria-labelledby="checklist-title">
+            <div class="checklist-header">
+              <span id="checklist-title">Hạng mục / dữ liệu</span>
+              <span>Bằng chứng & phiên bản</span>
+              <span>Người phụ trách</span>
+              <span>Trạng thái</span>
+              <span>Hành động</span>
+            </div>
+
+            <div class="group-row finance">
+              <strong>Tài chính</strong>
+              <span>Đủ điều kiện cho phân tích 12 tháng</span>
+            </div>
+            <div class="check-row">
+              <div class="check-title">12 Trường BCTC lịch sử</div>
+              <div class="check-evidence">BCTC_FY2025_v2.pdf · trang 42–84 · bộ dữ liệu v4</div>
+              <div class="owner"><span class="owner-initial">LT</span><span>Lan</span></div>
+              <div><span class="status success"><span class="status-dot" aria-hidden="true">✓</span>Đã xác nhận</span></div>
+              <button class="row-action" type="button">Xem bộ dữ liệu</button>
+            </div>
+            <div class="check-row">
+              <div class="check-title">Kịch bản Cơ sở & ngưỡng</div>
+              <div class="check-evidence">12 tháng · <time datetime="2025-12-31">31/12/2025</time> · Kịch bản v3</div>
+              <div class="owner"><span class="owner-initial">MN</span><span>Minh</span></div>
+              <div><span class="status success"><span class="status-dot" aria-hidden="true">✓</span>Đã xác nhận</span></div>
+              <button class="row-action" type="button">Xem Kịch bản</button>
+            </div>
+            <div class="check-row">
+              <div class="check-title">Hai Gói vay được phép</div>
+              <div class="check-evidence">Gói xanh A · Gói chuyển đổi B · tài trợ v2</div>
+              <div class="owner"><span class="owner-initial">MN</span><span>Minh</span></div>
+              <div><span class="status success"><span class="status-dot" aria-hidden="true">✓</span>Đã xác nhận</span></div>
+              <button class="row-action" type="button">Xem tài trợ</button>
+            </div>
+            <div class="check-row">
+              <div class="check-title">Tài chính của 5 Dự án</div>
+              <div class="check-evidence">CapEx & dòng tiền v5 · <abbr title="Giá trị hiện tại ròng">NPV</abbr><span class="sr-only">, giá trị hiện tại ròng</span> do hệ thống tính</div>
+              <div class="owner"><span class="owner-initial">MN</span><span>Minh</span></div>
+              <div><span class="status success"><span class="status-dot" aria-hidden="true">✓</span>Đã xác nhận</span></div>
+              <button class="row-action" type="button">Xem Dự án</button>
+            </div>
+
+            <div class="group-row carbon">
+              <strong>CO₂, rủi ro & quan hệ Dự án</strong>
+              <span>Hai phiếu chưa được dùng trong mục tiêu chính</span>
+            </div>
+            <div class="check-row">
+              <div class="check-title">Ba Phiếu bằng chứng phát thải</div>
+              <div class="check-evidence">3/5 phiếu · Scope 1/2 · nguồn thật · phiên bản EF đã khóa</div>
+              <div class="owner"><span class="owner-initial">TH</span><span>Thảo</span></div>
+              <div><span class="status success"><span class="status-dot" aria-hidden="true">✓</span>Đã xác nhận</span></div>
+              <button class="row-action" type="button">Xem 3 phiếu</button>
+            </div>
+            <div class="check-row">
+              <div class="check-title"><span class="mono">WHR-02</span> · Thu hồi nhiệt thải</div>
+              <div class="check-evidence">Nguồn hệ số phát thải chưa ghi phiên bản</div>
+              <div class="owner"><span class="owner-initial">TH</span><span>Thảo</span></div>
+              <div><span class="status warning"><span class="status-dot" aria-hidden="true">!</span>Cần kiểm tra</span></div>
+              <button class="row-action" type="button" aria-label="Mở phiếu WHR-02">Mở phiếu</button>
+            </div>
+            <div class="check-row">
+              <div class="check-title"><span class="mono">SOL-01</span> · Điện mặt trời mái</div>
+              <div class="check-evidence">Ranh giới Scope 2 chưa được xác nhận</div>
+              <div class="owner"><span class="owner-initial">TH</span><span>Thảo</span></div>
+              <div><span class="status warning"><span class="status-dot" aria-hidden="true">!</span>Cần kiểm tra</span></div>
+              <button class="row-action" type="button" aria-label="Mở phiếu SOL-01">Mở phiếu</button>
+            </div>
+            <div class="check-row">
+              <div class="check-title">Rủi ro & quan hệ của 5 Dự án</div>
+              <div class="check-evidence">Rubric v2 · không có cờ đỏ · không còn vùng CO₂ chồng lấn</div>
+              <div class="owner"><span class="owner-initial">TH</span><span>Thảo</span></div>
+              <div><span class="status success"><span class="status-dot" aria-hidden="true">✓</span>Đã xác nhận</span></div>
+              <button class="row-action" type="button">Xem rubric</button>
+            </div>
+          </section>
+
+          <aside class="stale-banner" role="status" aria-live="polite" aria-label="Ví dụ cảnh báo kết quả lỗi thời">
+            <span class="stale-icon" aria-hidden="true">↻</span>
+            <div>
+              <strong>Cần chạy lại:</strong>
+              <span> RUN-028 dùng đầu vào v6; Hồ sơ hiện tại là v7. Kết quả cũ chỉ còn để truy vết.</span>
+            </div>
+            <button class="stale-action" type="button">Xem lịch sử</button>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

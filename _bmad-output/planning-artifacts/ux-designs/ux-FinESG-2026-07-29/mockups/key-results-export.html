@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FinESG Planner — So sánh và xuất Gói bằng chứng</title>
+  <style>
+    /*
+      Governing spine sections:
+      DESIGN.md — Brand & Style; Colors; Typography; Layout & Spacing; Components:
+      App shell, Status badge and banner, Result summary, Comparison table, Charts.
+      EXPERIENCE.md — Readiness/Version Contract; Optimization Transparency;
+      Evidence Package Contract; Component Patterns; State Patterns; UJ-6.
+      The spines win on conflict with this illustrative mock.
+    */
+    :root {
+      --background: #F5F7FA;
+      --surface: #FFFFFF;
+      --surface-subtle: #EEF2F6;
+      --surface-strong: #E2E8F0;
+      --on-surface: #172033;
+      --on-surface-muted: #526075;
+      --outline: #7A8798;
+      --outline-strong: #526075;
+      --primary: #164E63;
+      --primary-hover: #0F3F50;
+      --primary-subtle: #DDF1F4;
+      --on-primary: #FFFFFF;
+      --finance: #315C9B;
+      --carbon: #227354;
+      --risk: #8A3F67;
+      --debt: #925C2D;
+      --info: #2457A6;
+      --info-subtle: #E8F0FC;
+      --success: #19704E;
+      --success-subtle: #E5F4EC;
+      --warning: #8A5A00;
+      --warning-subtle: #FFF3D6;
+      --error: #B42318;
+      --error-subtle: #FDECEA;
+      --simulation: #6941C6;
+      --simulation-subtle: #F0EBFF;
+      --verified: #1F5A78;
+      --verified-subtle: #E5F1F7;
+      --focus: #1D4ED8;
+      --disabled: #97A3B2;
+      --canvas: var(--background);
+      --paper: var(--surface);
+      --paper-inset: var(--surface-subtle);
+      --paper-strong: var(--surface-strong);
+      --ink: var(--on-surface);
+      --ink-soft: var(--on-surface-muted);
+      --ink-faint: var(--on-surface-muted);
+      --line: var(--outline);
+      --line-soft: var(--outline);
+      --line-strong: var(--outline-strong);
+      --primary-soft: var(--primary-subtle);
+      --success-soft: var(--success-subtle);
+      --warning-soft: var(--warning-subtle);
+      --error-soft: var(--error-subtle);
+      --verified-soft: var(--verified-subtle);
+      --simulation-soft: var(--simulation-subtle);
+      --radius-sm: 4px;
+      --radius: 6px;
+      --radius-md: 8px;
+      --shadow-overlay: 0 16px 48px rgba(23, 32, 51, .16);
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--surface-strong); }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--background);
+      font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 32px;
+    }
+
+    button, input, a { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible,
+    a:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .page { display: grid; gap: 36px; max-width: 1500px; margin: 0 auto; }
+    .artifact-label {
+      color: var(--on-surface-muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin: 0 0 8px 6px;
+    }
+    .browser {
+      width: 1440px;
+      max-width: 100%;
+      min-height: 970px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--outline-strong);
+      border-radius: 12px;
+      background: var(--canvas);
+      box-shadow: var(--shadow-overlay);
+    }
+    .browser-bar {
+      height: 38px;
+      display: grid;
+      grid-template-columns: 160px 1fr 160px;
+      align-items: center;
+      padding: 0 14px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--ink-faint);
+      font-size: 11px;
+    }
+    .window-dots { display: flex; gap: 6px; }
+    .window-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--outline-strong); }
+    .address {
+      justify-self: center;
+      width: min(520px, 70%);
+      border: 1px solid var(--line-soft);
+      border-radius: 5px;
+      background: var(--paper);
+      text-align: center;
+      padding: 4px 12px;
+    }
+    .demo-chip { justify-self: end; font-weight: 700; color: var(--simulation); }
+    .app { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 932px; }
+    .sidebar {
+      padding: 20px 14px;
+      border-right: 1px solid var(--line-soft);
+      background: var(--canvas);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 8px 22px;
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: var(--on-primary);
+      background: var(--primary);
+      border-radius: 7px 3px 7px 3px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .brand strong { display: block; font-size: 15px; letter-spacing: -.01em; }
+    .brand span { display: block; color: var(--ink-faint); font-size: 11px; }
+    .case-switcher {
+      margin: 0 4px 16px;
+      padding: 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .case-switcher small { display: block; color: var(--ink-faint); margin-bottom: 3px; }
+    .case-switcher strong { display: block; font-size: 12px; }
+    .nav-label {
+      margin: 18px 10px 6px;
+      color: var(--ink-faint);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      align-items: center;
+      gap: 9px;
+      min-height: 44px;
+      padding: 7px 10px;
+      margin: 2px 0;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--on-surface);
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .nav-item .dot {
+      width: 8px;
+      height: 8px;
+      border: 2px solid var(--line-strong);
+      border-radius: 50%;
+      justify-self: center;
+    }
+    .nav-item.done .dot { border-color: var(--success); background: var(--success); }
+    .nav-item.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .nav-item.active .dot { border-color: var(--primary); background: var(--primary); }
+    .nav-item .count {
+      min-width: 19px;
+      height: 19px;
+      display: grid;
+      place-items: center;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--warning-soft);
+      color: var(--warning);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .side-note {
+      margin: 26px 6px 0;
+      padding: 11px;
+      border-left: 3px solid var(--verified);
+      background: var(--verified-soft);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      color: var(--verified);
+      font-size: 11px;
+    }
+
+    .main { min-width: 0; background: var(--canvas); }
+    .case-rail {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.4fr) repeat(3, minmax(140px, .7fr));
+      align-items: center;
+      min-height: 62px;
+      padding: 10px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .case-rail strong { display: block; font-size: 13px; }
+    .case-rail small { color: var(--ink-faint); font-size: 11px; }
+    .rail-cell { padding-left: 16px; border-left: 1px solid var(--line-soft); }
+    .rail-cell .key { display: block; color: var(--ink-faint); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .rail-cell .value { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 12px; font-weight: 700; }
+    .rail-check { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+    .content { padding: 22px 24px 30px; }
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    h1 { font-size: 25px; line-height: 1.2; letter-spacing: -.025em; margin: 0; }
+    .subtitle { color: var(--ink-soft); margin-top: 6px; font-size: 13px; }
+    .head-actions { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      min-height: 44px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .btn.primary { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 23px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .badge.verified { color: var(--verified); background: var(--verified-soft); }
+    .badge.success { color: var(--success); background: var(--success-soft); }
+    .badge.warning { color: var(--warning); background: var(--warning-soft); }
+    .badge.simulation { color: var(--simulation); background: var(--simulation-soft); border: 1px dashed var(--simulation); }
+    .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .version-note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      border: 1px solid var(--verified);
+      border-left: 3px solid var(--verified);
+      border-radius: var(--radius);
+      background: var(--verified-soft);
+      color: var(--verified);
+      font-size: 12px;
+    }
+    .version-chain {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-soft);
+      font: 11px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+    .version-chain b { color: var(--ink); }
+    .arrow { color: var(--line-strong); }
+
+    .comparison {
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+    }
+    .strategy-strip {
+      display: grid;
+      grid-template-columns: 230px repeat(3, minmax(0, 1fr));
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .strip-label { padding: 14px 16px; background: var(--paper-inset); }
+    .strip-label strong { display: block; font-size: 12px; }
+    .strip-label span { color: var(--ink-faint); font-size: 10px; }
+    .strategy {
+      position: relative;
+      min-height: 96px;
+      padding: 13px 14px;
+      border-left: 1px solid var(--line-soft);
+    }
+    .strategy.selected { background: var(--primary-subtle); box-shadow: inset 0 3px 0 var(--primary); }
+    .strategy .title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .strategy h2 { font-size: 14px; margin: 0; }
+    .strategy .run { color: var(--ink-faint); font: 10px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace; margin-top: 4px; }
+    .strategy .order { margin-top: 8px; color: var(--ink-soft); font-size: 10px; }
+    .strategy .order b { color: var(--ink); }
+    .strategy .version { margin-top: 4px; color: var(--on-surface-muted); font: 10px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .comparison table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .comparison col.label-col { width: 230px; }
+    .comparison th, .comparison td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      border-left: 1px solid var(--line-soft);
+      vertical-align: top;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .comparison th {
+      border-left: none;
+      background: var(--surface-subtle);
+      color: var(--ink-soft);
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .comparison td { font-size: 12px; }
+    .comparison td.selected { background: var(--primary-subtle); }
+    .comparison thead th.strategy {
+      color: var(--on-surface);
+      background: var(--surface);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .comparison thead th.strategy.selected { background: var(--primary-subtle); }
+    .comparison tr:last-child th, .comparison tr:last-child td { border-bottom: none; }
+    .metric-main { display: block; font-weight: 800; color: var(--ink); }
+    .metric-sub { display: block; color: var(--ink-faint); font-size: 10px; margin-top: 1px; }
+    .metric-finance .metric-main { color: var(--finance); }
+    .metric-carbon .metric-main { color: var(--carbon); }
+    .metric-debt .metric-main { color: var(--debt); }
+    .metric-risk .metric-main { color: var(--risk); }
+    .projects {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .project-tag {
+      padding: 2px 5px;
+      border: 1px solid var(--line-soft);
+      border-radius: 3px;
+      background: var(--paper-inset);
+      color: var(--on-surface);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: 1.22fr .78fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 46px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .panel-head h2 { margin: 0; font-size: 13px; }
+    .panel-body { padding: 13px 14px; }
+    .project-explain {
+      display: grid;
+      grid-template-columns: 170px 1fr 160px;
+      gap: 12px;
+      align-items: start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .project-explain:last-child { border-bottom: none; padding-bottom: 0; }
+    .project-explain:first-child { padding-top: 0; }
+    .project-explain strong { font-size: 11px; display: block; }
+    .project-explain small { color: var(--ink-faint); font-size: 10px; }
+    .reason { color: var(--ink-soft); font-size: 11px; }
+    .impact { text-align: right; font-size: 10px; color: var(--ink-soft); }
+    .impact b { display: block; color: var(--ink); font-size: 11px; }
+    .constraint-list { display: grid; gap: 9px; }
+    .constraint {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .constraint:last-child { border-bottom: none; padding-bottom: 0; }
+    .constraint strong { display: block; font-size: 11px; }
+    .constraint small { color: var(--ink-faint); font-size: 10px; }
+    .constraint .numbers { text-align: right; font: 10px/1.45 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .warning-card {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 9px;
+      margin-top: 11px;
+      padding: 10px;
+      border-left: 3px solid var(--warning);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: var(--warning-soft);
+      color: var(--warning);
+      font-size: 10px;
+    }
+    .warning-symbol { font-weight: 900; font-size: 14px; }
+
+    /* Alternate export-preview state */
+    .export-app { grid-template-columns: 250px minmax(0, 1fr); }
+    .export-workspace { position: relative; min-width: 0; }
+    .export-workspace::after {
+      content: "";
+      position: absolute;
+      inset: 62px 0 0;
+      background: var(--on-surface);
+      opacity: .28;
+      z-index: 2;
+    }
+    .dimmed-page { padding: 22px 24px; filter: saturate(.72); }
+    .ghost-row { height: 52px; margin-bottom: 10px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--paper); }
+    .export-drawer {
+      position: absolute;
+      z-index: 3;
+      top: 62px;
+      right: 0;
+      bottom: 0;
+      width: 560px;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      border-left: 1px solid var(--line-soft);
+      box-shadow: var(--shadow-overlay);
+    }
+    .drawer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px 15px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .drawer-head h1 { font-size: 19px; }
+    .close-btn {
+      width: 48px;
+      min-width: 48px;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink-soft);
+    }
+    .drawer-body { flex: 1; overflow: auto; padding: 16px 20px; }
+    .export-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 13px;
+    }
+    .summary-cell { padding: 9px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--paper-inset); }
+    .summary-cell span { display: block; color: var(--ink-faint); font-size: 9px; text-transform: uppercase; letter-spacing: .05em; }
+    .summary-cell strong { display: block; font-size: 11px; margin-top: 3px; }
+    .section-list { border: 1px solid var(--line-soft); border-radius: var(--radius); overflow: hidden; }
+    .section-row {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 44px;
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .section-row:last-child { border-bottom: none; }
+    .section-num {
+      width: 21px;
+      height: 21px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--success-soft);
+      color: var(--success);
+      font-size: 9px;
+      font-weight: 900;
+    }
+    .section-row strong { display: block; font-size: 10px; }
+    .section-row small { display: block; color: var(--ink-faint); font-size: 9px; }
+    .pages { color: var(--ink-faint); font-size: 9px; font-variant-numeric: tabular-nums; }
+    .sensitive-note {
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid var(--warning);
+      border-radius: var(--radius);
+      background: var(--warning-soft);
+      color: var(--warning);
+      font-size: 10px;
+    }
+    .file-preview {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      font-size: 10px;
+    }
+    .file-preview code { color: var(--primary); font: 10px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .drawer-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 20px;
+      border-top: 1px solid var(--line-soft);
+      background: var(--surface);
+    }
+    .drawer-foot small { max-width: 280px; color: var(--ink-faint); font-size: 9px; }
+
+    /* Meaningful interface text never drops below the 12px accessibility floor. */
+    .address,
+    .demo-chip,
+    .brand span,
+    .case-switcher small,
+    .nav-label,
+    .nav-item .count,
+    .side-note,
+    .side-note strong,
+    .case-rail small,
+    .rail-cell .key,
+    .eyebrow,
+    .version-chain,
+    .strip-label span,
+    .badge,
+    .strategy .run,
+    .strategy .version,
+    .strategy .order,
+    .comparison th,
+    .project-tag,
+    .metric-sub,
+    .project-explain strong,
+    .project-explain small,
+    .reason,
+    .impact,
+    .impact b,
+    .constraint strong,
+    .constraint small,
+    .constraint .numbers,
+    .warning-card,
+    .summary-cell span,
+    .summary-cell strong,
+    .section-num,
+    .section-row strong,
+    .section-row small,
+    .pages,
+    .sensitive-note,
+    .file-preview,
+    .file-preview code,
+    .drawer-foot small {
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      body { padding: 16px; }
+      .browser { min-width: 1040px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section aria-labelledby="mock-compare">
+      <p class="artifact-label" id="mock-compare">Key screen 04A · S15/S16 · So sánh Chiến lược</p>
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="window-dots"><i></i><i></i><i></i></div>
+          <div class="address">finesg.local/ho-so/HS-2027-014/ket-qua/so-sanh</div>
+          <div class="demo-chip">DỮ LIỆU MINH HỌA</div>
+        </div>
+        <div class="app">
+          <aside class="sidebar" aria-label="Điều hướng Hồ sơ">
+            <div class="brand">
+              <div class="brand-mark">F</div>
+              <div><strong>FinESG Planner</strong><span>Sàng lọc CapEx xanh</span></div>
+            </div>
+            <div class="case-switcher">
+              <small>Hồ sơ đang mở · HS-2027-014</small>
+              <strong>Xi măng An Phú · CapEx 2027</strong>
+            </div>
+            <div class="nav-label">Hồ sơ</div>
+            <nav aria-label="Điều hướng Hồ sơ">
+              <a class="nav-item done" href="#overview"><span class="dot" aria-hidden="true"></span><span>Tổng quan</span></a>
+              <a class="nav-item done" href="#bctc"><span class="dot" aria-hidden="true"></span><span>BCTC</span></a>
+              <a class="nav-item done" href="#scenario"><span class="dot" aria-hidden="true"></span><span>Kịch bản &amp; tài trợ</span></a>
+              <a class="nav-item done" href="#projects"><span class="dot" aria-hidden="true"></span><span>Dự án</span></a>
+              <a class="nav-item done" href="#optimize"><span class="dot" aria-hidden="true"></span><span>Tối ưu</span></a>
+              <a class="nav-item active" href="#comparison" aria-current="page"><span class="dot" aria-hidden="true"></span><span>Kết quả</span><span class="count" aria-label="3 lần chạy">3</span></a>
+              <a class="nav-item" href="#evidence"><span class="dot" aria-hidden="true"></span><span>Bằng chứng &amp; lịch sử</span></a>
+            </nav>
+            <div class="side-note"><strong>Sẵn sàng quyết định</strong><br>3 lần chạy đã vượt Bộ kiểm tra nghiệm và dùng cùng phiên bản đầu vào.</div>
+          </aside>
+
+          <section class="main">
+            <div class="case-rail" aria-label="Chuỗi bằng chứng Hồ sơ">
+              <div>
+                <strong>Nhà máy Xi măng An Phú</strong>
+                <small>Ngày gốc <time datetime="2026-12-31">31/12/2026</time> · <abbr title="Đồng Việt Nam">VND</abbr><span class="sr-only">, đồng Việt Nam</span> · Hợp nhất</small>
+              </div>
+              <div class="rail-cell"><span class="key">Đầu vào</span><span class="value"><i class="rail-check"></i>FS v3 · Kịch bản v2</span></div>
+              <div class="rail-cell"><span class="key">Danh mục</span><span class="value"><i class="rail-check"></i>Dự án v5 · 8/8</span></div>
+              <div class="rail-cell"><span class="key">Trạng thái</span><span class="value"><i class="rail-check"></i>Sẵn sàng quyết định</span></div>
+            </div>
+
+            <div class="content">
+              <header class="page-head">
+                <div>
+                  <div class="eyebrow">Kết quả · So sánh cùng phiên bản</div>
+                  <h1>Ba Chiến lược, ba cách phân bổ vốn</h1>
+                  <div class="subtitle">Các đại lượng được giữ riêng theo kỳ và đơn vị; không có điểm FinESG tổng hợp.</div>
+                </div>
+                <div class="head-actions">
+                  <button class="btn">Xem Audit Trail</button>
+                  <button class="btn primary">Chọn làm Phương án cuối</button>
+                  <button class="btn">Mở xem trước Gói bằng chứng</button>
+                </div>
+              </header>
+
+              <div class="version-note">
+                <div><strong>Có thể so sánh trực tiếp.</strong> Cả ba lần chạy dùng cùng phiên bản dữ liệu và quy tắc.</div>
+                <div class="version-chain"><b>FS-v3</b><span class="arrow">→</span><b>SCN-CB-v2</b><span class="arrow">→</span><b>PRJ-v5</b><span class="arrow">→</span><b>MODEL-1.0</b></div>
+              </div>
+
+              <section class="comparison" id="comparison" aria-label="Bảng so sánh Chiến lược">
+                <table>
+                  <caption class="sr-only">So sánh ba Phương án theo Chiến lược trên cùng phiên bản FS-v3, SCN-CB-v2, PRJ-v5 và MODEL-1.0</caption>
+                  <colgroup><col class="label-col"><col><col><col></colgroup>
+                  <thead>
+                    <tr>
+                      <th class="strip-label" scope="col"><strong>Phương án theo Chiến lược</strong><span>Đơn vị hiển thị tại từng hàng</span></th>
+                      <th class="strategy" scope="col">
+                        <div class="title-row"><h2>An toàn</h2><span class="badge verified">Tối ưu đã kiểm chứng</span></div>
+                        <div class="run">RUN-SAFE-102 · 10:14</div>
+                        <div class="version">FS-v3 · SCN-CB-v2 · PRJ-v5 · MODEL-1.0</div>
+                        <div class="order"><b><abbr title="Giá trị hiện tại ròng">NPV</abbr><span class="sr-only">, giá trị hiện tại ròng</span></b> → vay mới → chi phí tài trợ</div>
+                      </th>
+                      <th class="strategy selected" scope="col">
+                        <div class="title-row"><h2>Cân bằng</h2><span class="badge verified">Tối ưu đã kiểm chứng</span></div>
+                        <div class="run">RUN-BAL-104 · 10:19 · Đang chọn</div>
+                        <div class="version">FS-v3 · SCN-CB-v2 · PRJ-v5 · MODEL-1.0</div>
+                        <div class="order">CO₂ tối thiểu → <b>NPV</b> → chi phí → rủi ro</div>
+                      </th>
+                      <th class="strategy" scope="col">
+                        <div class="title-row"><h2>Chuyển đổi nhanh</h2><span class="badge verified">Tối ưu đã kiểm chứng</span></div>
+                        <div class="run">RUN-FAST-106 · 10:22</div>
+                        <div class="version">FS-v3 · SCN-CB-v2 · PRJ-v5 · MODEL-1.0</div>
+                        <div class="order">Ngưỡng tài chính → <b>CO₂</b> → NPV → chi phí</div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Dự án được chọn</th>
+                      <td><div class="projects"><span class="project-tag">P-01 Nhiệt dư</span><span class="project-tag">P-03 Nghiền hiệu suất cao</span></div></td>
+                      <td class="selected"><div class="projects"><span class="project-tag">P-01 Nhiệt dư</span><span class="project-tag">P-03 Nghiền hiệu suất cao</span><span class="project-tag">P-04 Điện mặt trời</span></div></td>
+                      <td><div class="projects"><span class="project-tag">P-01 Nhiệt dư</span><span class="project-tag">P-02 Nhiên liệu thay thế</span><span class="project-tag">P-04 Điện mặt trời</span></div></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">NPV trước tài trợ <span class="metric-sub">Vòng đời · tỷ <abbr title="Đồng Việt Nam">VND</abbr></span></th>
+                      <td class="metric-finance" aria-label="41 phẩy 8 tỷ đồng Việt Nam; cao nhất"><span class="metric-main">41,8</span><span class="metric-sub">cao nhất</span></td>
+                      <td class="selected metric-finance" aria-label="39 phẩy 6 tỷ đồng Việt Nam; giảm 2 phẩy 2 so với An toàn"><span class="metric-main">39,6</span><span class="metric-sub">−2,2 so với An toàn</span></td>
+                      <td class="metric-finance" aria-label="31 phẩy 2 tỷ đồng Việt Nam; lớn hơn hoặc bằng ngưỡng 30 phẩy 0"><span class="metric-main">31,2</span><span class="metric-sub">≥ ngưỡng 30,0</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">CO₂ đã xác nhận <span class="metric-sub"><abbr title="Tấn các-bon đi-ô-xít tương đương mỗi năm">tCO₂e/năm</abbr><span class="sr-only">, tấn các-bon đi-ô-xít tương đương mỗi năm</span> vận hành đầy đủ</span></th>
+                      <td class="metric-carbon" aria-label="37.200 tấn các-bon đi-ô-xít tương đương mỗi năm; 2 trên 2 Dự án đã xác nhận"><span class="metric-main">37.200</span><span class="metric-sub">2/2 Dự án đã xác nhận</span></td>
+                      <td class="selected metric-carbon" aria-label="49.800 tấn các-bon đi-ô-xít tương đương mỗi năm; lớn hơn hoặc bằng ngưỡng 45.000"><span class="metric-main">49.800</span><span class="metric-sub">≥ ngưỡng 45.000</span></td>
+                      <td class="metric-carbon" aria-label="71.500 tấn các-bon đi-ô-xít tương đương mỗi năm; cao nhất"><span class="metric-main">71.500</span><span class="metric-sub">cao nhất</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Vốn nội bộ / vay mới <span class="metric-sub">12 tháng · tỷ VND</span></th>
+                      <td class="metric-debt"><span class="metric-main">72 / 48</span><span class="metric-sub">Gói Xanh A</span></td>
+                      <td class="selected metric-debt"><span class="metric-main">69 / 61</span><span class="metric-sub">Gói Xanh A + B</span></td>
+                      <td class="metric-debt"><span class="metric-main">65 / 95</span><span class="metric-sub">Gói Xanh A + B</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Tiền mặt thấp nhất <span class="metric-sub">12 tháng · tỷ VND</span></th>
+                      <td aria-label="18 phẩy 2 tỷ đồng Việt Nam; ngưỡng 12 phẩy 0"><span class="metric-main">18,2</span><span class="metric-sub">ngưỡng 12,0</span></td>
+                      <td class="selected" aria-label="16 phẩy 4 tỷ đồng Việt Nam; ngưỡng 12 phẩy 0"><span class="metric-main">16,4</span><span class="metric-sub">ngưỡng 12,0</span></td>
+                      <td aria-label="12 phẩy 7 tỷ đồng Việt Nam; chạm gần ngưỡng 12 phẩy 0"><span class="metric-main">12,7</span><span class="metric-sub">chạm gần ngưỡng 12,0</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><abbr title="Hệ số khả năng trả nợ">DSCR</abbr><span class="sr-only">, hệ số khả năng trả nợ</span> 12 tháng <span class="metric-sub">lần</span></th>
+                      <td aria-label="1 phẩy 42 lần; ngưỡng 1 phẩy 20 lần"><span class="metric-main">1,42×</span><span class="metric-sub">ngưỡng 1,20×</span></td>
+                      <td class="selected" aria-label="1 phẩy 31 lần; ngưỡng 1 phẩy 20 lần"><span class="metric-main">1,31×</span><span class="metric-sub">ngưỡng 1,20×</span></td>
+                      <td aria-label="1 phẩy 20 lần; chạm ngưỡng"><span class="metric-main">1,20×</span><span class="metric-sub">chạm ngưỡng</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Nợ cuối kỳ / Vốn chủ cơ sở <span class="metric-sub">lần</span></th>
+                      <td aria-label="0 phẩy 68 lần; ngưỡng 0 phẩy 85 lần"><span class="metric-main">0,68×</span><span class="metric-sub">ngưỡng 0,85×</span></td>
+                      <td class="selected" aria-label="0 phẩy 73 lần; ngưỡng 0 phẩy 85 lần"><span class="metric-main">0,73×</span><span class="metric-sub">ngưỡng 0,85×</span></td>
+                      <td aria-label="0 phẩy 81 lần; ngưỡng 0 phẩy 85 lần"><span class="metric-main">0,81×</span><span class="metric-sub">ngưỡng 0,85×</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Chi phí tài trợ <span class="metric-sub">Giá trị hiện tại · tỷ VND</span></th>
+                      <td class="metric-debt" aria-label="6 phẩy 7 tỷ đồng Việt Nam"><span class="metric-main">6,7</span></td>
+                      <td class="selected metric-debt" aria-label="8 phẩy 4 tỷ đồng Việt Nam"><span class="metric-main">8,4</span></td>
+                      <td class="metric-debt" aria-label="13 phẩy 1 tỷ đồng Việt Nam"><span class="metric-main">13,1</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Rủi ro danh mục <span class="metric-sub">tổng điểm 0–10/Dự án</span></th>
+                      <td class="metric-risk"><span class="metric-main">5</span><span class="metric-sub">không có cờ đỏ</span></td>
+                      <td class="selected metric-risk"><span class="metric-main">6</span><span class="metric-sub">không có cờ đỏ</span></td>
+                      <td class="metric-risk"><span class="metric-main">8</span><span class="metric-sub">không có cờ đỏ</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+
+              <div class="lower-grid">
+                <section class="panel">
+                  <div class="panel-head"><h2>Giải thích Dự án · Phương án Cân bằng</h2><button class="btn">Xem toàn bộ 8 Dự án</button></div>
+                  <div class="panel-body">
+                    <div class="project-explain">
+                      <div><strong>P-04 · Điện mặt trời mái</strong><small>Được chọn · Gói Xanh B</small></div>
+                      <div class="reason">Đóng góp CO₂ giúp đạt ngưỡng 45.000 tCO₂e/năm; Phương án vẫn đạt các ngưỡng tài chính đã cấu hình.</div>
+                      <div class="impact"><b>+12.600 tCO₂e/năm</b>NPV +6,4 tỷ · Vay +13 tỷ</div>
+                    </div>
+                    <div class="project-explain">
+                      <div><strong>P-02 · Nhiên liệu thay thế</strong><small>Không được chọn</small></div>
+                      <div class="reason">Không cải thiện tầng NPV sau khi ngưỡng CO₂ đã đạt; làm tăng Chi phí tài trợ trong cấu hình hiện tại.</div>
+                      <div class="impact"><b>Không vi phạm riêng lẻ</b>Lý do thuộc thứ tự mục tiêu</div>
+                    </div>
+                    <div class="project-explain">
+                      <div><strong>P-03 · Nghiền hiệu suất cao</strong><small>Được chọn · vốn nội bộ</small></div>
+                      <div class="reason">NPV dương và đáp ứng điều kiện nguồn vốn; có phần CapEx sau tháng 12 cần kế hoạch riêng.</div>
+                      <div class="impact"><b>82% CapEx đã kiểm tra</b>18% chưa kiểm chứng tài trợ</div>
+                    </div>
+                  </div>
+                </section>
+                <aside class="panel">
+                  <div class="panel-head"><h2>Ràng buộc gần ngưỡng</h2><span class="badge success">Nghiệm hợp lệ</span></div>
+                  <div class="panel-body">
+                    <div class="constraint-list">
+                      <div class="constraint"><div><strong>CASH-M04 · Tiền tháng 4</strong><small>Không thấp hơn 12,0 tỷ VND</small></div><div class="numbers">16,4<br><span style="color:var(--success)">dư +4,4</span></div></div>
+                      <div class="constraint"><div><strong>CO2-MIN · CO₂ tối thiểu</strong><small>Chỉ tính CO₂ đã xác nhận</small></div><div class="numbers">49.800<br><span style="color:var(--success)">dư +4.800</span></div></div>
+                      <div class="constraint"><div><strong>DSCR-12 · DSCR tối thiểu</strong><small>Ngưỡng <span aria-hidden="true">1,20×</span><span class="sr-only">1 phẩy 20 lần</span></small></div><div class="numbers"><span aria-hidden="true">1,31×</span><span class="sr-only">1 phẩy 31 lần</span><br><span style="color:var(--success)"><span aria-hidden="true">dư +0,11×</span><span class="sr-only">dư 0 phẩy 11 lần</span></span></div></div>
+                    </div>
+                    <div class="warning-card"><span class="warning-symbol">!</span><div><strong>Giới hạn 12 tháng</strong><br>P-03 còn 18% CapEx sau tháng 12. Phần tài trợ này chưa được mô hình kiểm chứng.</div></div>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="mock-export">
+      <p class="artifact-label" id="mock-export">Key screen 04B · S18 · Bản xem trước Gói bằng chứng</p>
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="window-dots"><i></i><i></i><i></i></div>
+          <div class="address">finesg.local/ho-so/HS-2027-014/ket-qua/RUN-BAL-104</div>
+          <div class="demo-chip">DỮ LIỆU MINH HỌA</div>
+        </div>
+        <div class="app export-app">
+          <aside class="sidebar" aria-label="Điều hướng Hồ sơ" inert aria-hidden="true">
+            <div class="brand"><div class="brand-mark">F</div><div><strong>FinESG Planner</strong><span>Sàng lọc CapEx xanh</span></div></div>
+            <div class="case-switcher"><small>Hồ sơ đang mở · HS-2027-014</small><strong>Xi măng An Phú · CapEx 2027</strong></div>
+            <div class="nav-label">Hồ sơ</div>
+            <nav aria-label="Điều hướng Hồ sơ">
+              <a class="nav-item done" href="#overview"><span class="dot" aria-hidden="true"></span><span>Tổng quan</span></a>
+              <a class="nav-item done" href="#bctc"><span class="dot" aria-hidden="true"></span><span>BCTC</span></a>
+              <a class="nav-item done" href="#scenario"><span class="dot" aria-hidden="true"></span><span>Kịch bản &amp; tài trợ</span></a>
+              <a class="nav-item done" href="#projects"><span class="dot" aria-hidden="true"></span><span>Dự án</span></a>
+              <a class="nav-item done" href="#optimize"><span class="dot" aria-hidden="true"></span><span>Tối ưu</span></a>
+              <a class="nav-item done" href="#results"><span class="dot" aria-hidden="true"></span><span>Kết quả</span></a>
+              <a class="nav-item active" href="#export-dialog-title" aria-current="page"><span class="dot" aria-hidden="true"></span><span>Bằng chứng &amp; lịch sử</span></a>
+            </nav>
+          </aside>
+          <section class="main export-workspace">
+            <div class="case-rail" inert aria-hidden="true">
+              <div><strong>Nhà máy Xi măng An Phú</strong><small>Ngày gốc <time datetime="2026-12-31">31/12/2026</time> · <abbr title="Đồng Việt Nam">VND</abbr> · Hợp nhất</small></div>
+              <div class="rail-cell"><span class="key">Đầu vào</span><span class="value"><i class="rail-check"></i>FS v3 · Kịch bản v2</span></div>
+              <div class="rail-cell"><span class="key">Lần chạy</span><span class="value"><i class="rail-check"></i>RUN-BAL-104</span></div>
+              <div class="rail-cell"><span class="key">Kiểm chứng</span><span class="value"><i class="rail-check"></i>Tối ưu đã kiểm chứng</span></div>
+            </div>
+            <div class="dimmed-page" inert aria-hidden="true">
+              <div class="page-head"><div><div class="eyebrow">Bằng chứng &amp; lịch sử</div><h1>Gói bằng chứng</h1><div class="subtitle">Các lần xuất và Audit Trail của Hồ sơ.</div></div></div>
+              <div class="ghost-row"></div><div class="ghost-row"></div><div class="ghost-row"></div><div class="ghost-row"></div>
+            </div>
+            <aside class="export-drawer" role="dialog" aria-modal="true" aria-labelledby="export-dialog-title" aria-describedby="export-dialog-description">
+              <header class="drawer-head">
+                <div><div class="eyebrow">S18 · Xem lại trước khi xuất</div><h1 id="export-dialog-title" tabindex="-1">Gói bằng chứng · Cân bằng</h1><div class="subtitle" id="export-dialog-description">RUN-BAL-104 · Tối ưu đã kiểm chứng · kiểm tra phạm vi trước khi tạo tệp nhạy cảm</div></div>
+                <button class="close-btn" type="button" aria-label="Đóng bản xem trước Gói bằng chứng">×</button>
+              </header>
+              <div class="drawer-body">
+                <div class="export-summary">
+                  <div class="summary-cell"><span>Loại đầu ra</span><strong>Phân tích tài chính 12 tháng</strong></div>
+                  <div class="summary-cell"><span>Watermark</span><strong>Không có nhãn mô phỏng</strong></div>
+                  <div class="summary-cell"><span>Phiên bản</span><strong>FS-v3 · PRJ-v5</strong></div>
+                </div>
+                <div class="section-list" aria-label="Nội dung Gói bằng chứng">
+                  <div class="section-row"><span class="section-num">1</span><div><strong>Phạm vi và giới hạn sử dụng</strong><small>Doanh nghiệp, Ngày gốc, loại đầu ra, người xác nhận</small></div><span class="pages">2 trang</span></div>
+                  <div class="section-row"><span class="section-num">2</span><div><strong>12 Trường BCTC và Provenance</strong><small>Giá trị gốc/chuẩn hóa, trang, vùng nguồn, Confidence</small></div><span class="pages">7 trang</span></div>
+                  <div class="section-row"><span class="section-num">3</span><div><strong>Kịch bản, Gói vay và Ngưỡng tài chính</strong><small>Lịch 12 tháng và trạng thái xác nhận</small></div><span class="pages">6 trang</span></div>
+                  <div class="section-row"><span class="section-num">4</span><div><strong>Dự án, CO₂ và rủi ro</strong><small>8 Dự án · 7 dữ liệu thật · 1 mô phỏng bị loại khỏi mục tiêu</small></div><span class="pages">12 trang</span></div>
+                  <div class="section-row"><span class="section-num">5</span><div><strong>CapEx sau tháng 12</strong><small>P-03: 18% vốn tương lai chưa được kiểm chứng</small></div><span class="pages">1 trang</span></div>
+                  <div class="section-row"><span class="section-num">6</span><div><strong>Chiến lược, Phương án và giải thích</strong><small>Thứ tự mục tiêu, lý do chọn/loại, ràng buộc chạm ngưỡng</small></div><span class="pages">8 trang</span></div>
+                  <div class="section-row"><span class="section-num">7</span><div><strong>Phiên bản mô hình, quy tắc và Audit Trail</strong><small>Bộ giải, Bộ kiểm tra nghiệm, nguồn hệ số phát thải</small></div><span class="pages">5 trang</span></div>
+                  <div class="section-row"><span class="section-num">8</span><div><strong>Tuyên bố giới hạn sản phẩm</strong><small>Không phải phê duyệt đầu tư/tín dụng, kiểm toán hay chứng nhận ESG</small></div><span class="pages">1 trang</span></div>
+                </div>
+                <div class="sensitive-note"><strong>Tệp chứa dữ liệu tài chính nhạy cảm.</strong> Chỉ chia sẻ theo quy trình nội bộ của doanh nghiệp. Việc xuất sẽ được ghi vào Audit Trail với người thực hiện và thời điểm.</div>
+                <div class="file-preview"><div><span style="color:var(--ink-faint)">Tên tệp dự kiến</span><br><code>FinESG_AnPhu_CanBang_RUN-BAL-104.pdf</code></div><div style="text-align:right"><span style="color:var(--ink-faint)">Ước tính</span><br><strong>42 trang · 3,8 MB</strong></div></div>
+              </div>
+              <footer class="drawer-foot">
+                <small>Gói này ghi nhận quyết định hỗ trợ sàng lọc sơ bộ; không phải phê duyệt có thẩm quyền.</small>
+                <div class="head-actions"><button class="btn" type="button">Quay lại kiểm tra</button><button class="btn primary" type="button">Xuất Gói bằng chứng PDF</button></div>
+              </footer>
+            </aside>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
